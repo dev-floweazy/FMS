@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    <record>-->
+
+
+    <!-- Root Menu -->
+    <menuitem id="menu_fms_root"
+              name="FMS"
+              web_icon="fms,static/description/icon.png"
+              sequence="10"/>
+
+    <!-- Operations Menu -->
+    <menuitem id="menu_fms_operations"
+              name="Operations"
+              parent="menu_fms_root"
+              sequence="10"/>
+
+    <menuitem id="menu_fms_ticket"
+              name="Tickets"
+              parent="menu_fms_operations"
+              action="action_fms_ticket"
+              sequence="10"/>
+
+<!--    <menuitem id="menu_fms_job"-->
+<!--              name="Jobs"-->
+<!--              parent="menu_fms_operations"-->
+<!--              action="action_fms_job"-->
+<!--              sequence="20"/>-->
+
+<!--    <menuitem id="menu_fms_job_calendar"-->
+<!--              name="Job Calendar"-->
+<!--              parent="menu_fms_operations"-->
+<!--              action="action_fms_job_calendar"-->
+<!--              sequence="30"/>-->
+
+    <!-- Customers Menu -->
+    <menuitem id="menu_fms_customers"
+              name="Customers"
+              parent="menu_fms_root"
+              sequence="20"/>
+
+<!--    <menuitem id="menu_fms_customer_list"-->
+<!--              name="Customers"-->
+<!--              parent="menu_fms_customers"-->
+<!--              action="base.action_partner_form"-->
+<!--              sequence="10"/>-->
+
+<!--    <menuitem id="menu_fms_site"-->
+<!--              name="Sites"-->
+<!--              parent="menu_fms_customers"-->
+<!--              action="action_fms_site"-->
+<!--              sequence="20"/>-->
+
+<!--    <menuitem id="menu_fms_rate_card"-->
+<!--              name="Rate Cards"-->
+<!--              parent="menu_fms_customers"-->
+<!--              action="action_fms_rate_card"-->
+<!--              sequence="30"/>-->
+
+    <!-- Vendors Menu -->
+    <menuitem id="menu_fms_vendors"
+              name="Vendors"
+              parent="menu_fms_root"
+              sequence="30"/>
+
+<!--    <menuitem id="menu_fms_vendor_list"-->
+<!--              name="Vendors"-->
+<!--              parent="menu_fms_vendors"-->
+<!--              action="action_fms_vendor"-->
+<!--              sequence="10"/>-->
+
+<!--    <menuitem id="menu_fms_vendor_performance"-->
+<!--              name="Performance"-->
+<!--              parent="menu_fms_vendors"-->
+<!--              action="action_fms_vendor_performance"-->
+<!--              sequence="20"/>-->
+
+    <!-- Billing Menu -->
+    <menuitem id="menu_fms_billing"
+              name="Billing"
+              parent="menu_fms_root"
+              sequence="40"/>
+
+<!--    <menuitem id="menu_fms_sales_orders"-->
+<!--              name="Sales Orders"-->
+<!--              parent="menu_fms_billing"-->
+<!--              action="sale.action_orders"-->
+<!--              sequence="10"/>-->
+
+<!--    <menuitem id="menu_fms_invoices"-->
+<!--              name="Customer Invoices"-->
+<!--              parent="menu_fms_billing"-->
+<!--              action="account.action_move_out_invoice_type"-->
+<!--              sequence="20"/>-->
+
+<!--    <menuitem id="menu_fms_vendor_bills"-->
+<!--              name="Vendor Bills"-->
+<!--              parent="menu_fms_billing"-->
+<!--              action="account.action_move_in_invoice_type"-->
+<!--              sequence="30"/>-->
+
+<!--    <menuitem id="menu_fms_consolidated_billing"-->
+<!--              name="Consolidated Billing"-->
+<!--              parent="menu_fms_billing"-->
+<!--              action="action_fms_consolidated_invoice"-->
+<!--              sequence="40"/>-->
+
+    <!-- Reports Menu -->
+    <menuitem id="menu_fms_reports"
+              name="Reports"
+              parent="menu_fms_root"
+              sequence="50"/>
+
+<!--    <menuitem id="menu_fms_margin_report"-->
+<!--              name="Margin Analysis"-->
+<!--              parent="menu_fms_reports"-->
+<!--              action="action_fms_margin_report"-->
+<!--              sequence="10"/>-->
+
+<!--    <menuitem id="menu_fms_sla_report"-->
+<!--              name="SLA Compliance"-->
+<!--              parent="menu_fms_reports"-->
+<!--              action="action_fms_sla_report"-->
+<!--              sequence="20"/>-->
+<!--    </record>-->
+</odoo>

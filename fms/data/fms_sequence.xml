@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="seq_fms_ticket" model="ir.sequence">
+            <field name="name">FMS Ticket</field>
+            <field name="code">fms.ticket</field>
+            <field name="prefix">TKT-%(year)s%(month)s-</field>
+            <field name="padding">4</field>
+        </record>
+    </data>
+</odoo>

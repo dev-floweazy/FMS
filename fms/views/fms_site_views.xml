@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ============================================ -->
+    <!-- SITE VIEWS -->
+    <!-- ============================================ -->
+
+    <record id="view_fms_site_list" model="ir.ui.view">
+        <field name="name">fms.site.list</field>
+        <field name="model">fms.site</field>
+        <field name="arch" type="xml">
+            <list string="Sites">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+                <field name="city"/>
+                <field name="state_id"/>
+                <field name="contact_person"/>
+                <field name="contact_phone"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fms_site_form" model="ir.ui.view">
+        <field name="name">fms.site.form</field>
+        <field name="model">fms.site</field>
+        <field name="arch" type="xml">
+            <form string="Site">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_tickets" type="object" class="oe_stat_button" icon="fa-ticket">
+                            <field name="ticket_count" widget="statinfo" string="Tickets"/>
+                        </button>
+                        <button name="action_view_jobs" type="object" class="oe_stat_button" icon="fa-tasks">
+                            <field name="job_count" widget="statinfo" string="Jobs"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="not active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Site Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="partner_id"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="contact_person"/>
+                            <field name="contact_phone"/>
+                            <field name="contact_email" widget="email"/>
+                        </group>
+                    </group>
+                    <group string="Address">
+                        <group>
+                            <field name="street" placeholder="Street..."/>
+                            <field name="street2" placeholder="Street 2..."/>
+                            <field name="city"/>
+                        </group>
+                        <group>
+                            <field name="state_id"/>
+                            <field name="zip"/>
+                            <field name="country_id"/>
+                        </group>
+                    </group>
+                    <group string="Additional Info">
+                        <field name="notes" placeholder="Site-specific notes, access instructions, etc."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+     <record id="action_fms_site" model="ir.actions.act_window">
+        <field name="name">Sites</field>
+        <field name="res_model">fms.site</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_active_sites': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first site
+            </p>
+            <p>
+                Sites are customer locations where services are performed.
+            </p>
+        </field>
+    </record>
+</odoo>
