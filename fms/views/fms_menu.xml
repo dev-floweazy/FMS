@@ -14,6 +14,17 @@
               name="Operations"
               parent="menu_fms_root"
               sequence="10"/>
+        <!-- Operations Menu -->
+    <menuitem id="menu_fms_vendors_root"
+              name="Vendors"
+              parent="menu_fms_root"
+              sequence="20"/>
+
+     <!-- Operations Menu -->
+    <menuitem id="menu_fms_configuration"
+              name="Configuration"
+              parent="menu_fms_root"
+              sequence="30"/>
 
     <menuitem id="menu_fms_ticket"
               name="Tickets"
@@ -21,11 +32,17 @@
               action="action_fms_ticket"
               sequence="10"/>
 
-<!--    <menuitem id="menu_fms_job"-->
-<!--              name="Jobs"-->
-<!--              parent="menu_fms_operations"-->
-<!--              action="action_fms_job"-->
-<!--              sequence="20"/>-->
+    <menuitem id="menu_fms_service_category"
+              name="Service Category"
+              parent="menu_fms_configuration"
+              action="action_fms_service_category"
+              sequence="10"/>
+
+    <menuitem id="menu_fms_job"
+              name="Jobs"
+              parent="menu_fms_operations"
+              action="action_fms_job"
+              sequence="20"/>
 
 <!--    <menuitem id="menu_fms_job_calendar"-->
 <!--              name="Job Calendar"-->
@@ -34,9 +51,10 @@
 <!--              sequence="30"/>-->
 
     <!-- Customers Menu -->
-    <menuitem id="menu_fms_customers"
-              name="Customers"
-              parent="menu_fms_root"
+    <menuitem id="menu_fms_vendor"
+              name="vendors"
+              parent="menu_fms_vendors_root"
+              action="action_fms_vendors"
               sequence="20"/>
 
 <!--    <menuitem id="menu_fms_customer_list"-->
@@ -45,11 +63,11 @@
 <!--              action="base.action_partner_form"-->
 <!--              sequence="10"/>-->
 
-<!--    <menuitem id="menu_fms_site"-->
-<!--              name="Sites"-->
-<!--              parent="menu_fms_customers"-->
-<!--              action="action_fms_site"-->
-<!--              sequence="20"/>-->
+    <menuitem id="menu_fms_site"
+              name="Sites"
+              parent="menu_fms_configuration"
+              action="action_fms_site"
+              sequence="20"/>
 
 <!--    <menuitem id="menu_fms_rate_card"-->
 <!--              name="Rate Cards"-->
@@ -57,11 +75,11 @@
 <!--              action="action_fms_rate_card"-->
 <!--              sequence="30"/>-->
 
-    <!-- Vendors Menu -->
-    <menuitem id="menu_fms_vendors"
-              name="Vendors"
-              parent="menu_fms_root"
-              sequence="30"/>
+<!--    &lt;!&ndash; Vendors Menu &ndash;&gt;-->
+<!--    <menuitem id="menu_fms_vendors"-->
+<!--              name="Vendors"-->
+<!--              parent="menu_fms_root"-->
+<!--              sequence="30"/>-->
 
 <!--    <menuitem id="menu_fms_vendor_list"-->
 <!--              name="Vendors"-->

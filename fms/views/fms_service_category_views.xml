@@ -24,7 +24,7 @@
         <field name="arch" type="xml">
             <form string="Service Category">
                 <sheet>
-                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="not active"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
                     <group>
                         <group>
                             <field name="name"/>
@@ -40,22 +40,22 @@
                         <page string="Services" name="services">
 <!--                            domain="[('is_fms_service', '=', True)]"-->
                             <field name="product_ids" >
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="default_code"/>
                                     <field name="uom_id"/>
                                     <field name="standard_price"/>
                                     <field name="list_price"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>attr
                         <page string="Sub-Categories" invisible="not child_ids">
                             <field name="child_ids">
-                                <tree>
+                                <list>
                                     <field name="name"/>
                                     <field name="code"/>
                                     <field name="default_sla_hours"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -67,7 +67,7 @@
       <record id="action_fms_service_category" model="ir.actions.act_window">
         <field name="name">Service Categories</field>
         <field name="res_model">fms.service.category</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first service category

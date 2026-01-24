@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="view_res_partner_form_fms_vendor" model="ir.ui.view">
+    <field name="name">res.partner.form.fms.vendor</field>
+    <field name="model">res.partner</field>
+    <field name="inherit_id" ref="base.view_partner_form"/>
+    <field name="arch" type="xml">
+
+        <!-- Add checkbox near vendor info -->
+        <xpath expr="//field[@name='function']" position="after">
+            <field name="is_fms_vendor"/>
+        </xpath>
+
+        <!-- New tab -->
+        <xpath expr="//notebook" position="inside">
+            <page string="FMS Vendor"
+                  invisible="not is_fms_vendor">
+                <group>
+                    <group>
+                        <field name="vendor_rating" widget="rating"/>
+                        <field name="vendor_service_category_ids"
+                               widget="many2many_tags"/>
+                    </group>
+                </group>
+<!--                <group string="Jobs">-->
+                    <field name="vendor_job_ids" string="Jobs" nolabel="0">
+                        <list>
+                            <field name="name"/>
+                            <field name="state"/>
+                            <field name="site_id"/>
+                            <field name="scheduled_date"/>
+                        </list>
+                    </field>
+<!--                </group>-->
+
+            </page>
+        </xpath>
+
+    </field>
+</record>
+
+    <record id="action_fms_vendors" model="ir.actions.act_window">
+        <field name="name">Vendors</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_fms_vendor', '=', True)]</field>
+        <field name="context">
+            {
+            'default_is_fms_vendor': 1,
+            'search_default_fms_vendor': 1
+            }
+        </field>
+    </record>
+
+</odoo>

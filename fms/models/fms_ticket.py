@@ -67,7 +67,7 @@ class FMSTicket(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('fms.ticket') or 'New'
         return super().create(vals_list)
-    
+
     @api.depends('service_category_id', 'requested_date', 'priority')
     def _compute_sla(self):
         for ticket in self:
@@ -75,23 +75,32 @@ class FMSTicket(models.Model):
             pass
 
     def action_open(self):
-        pass
+        for rec in self:
+            rec.write({'state': 'open'})
+
 
     def action_assign(self):
-        pass
+        for rec in self:
+            rec.write({'state': 'assigned'})
 
     def action_start(self):
-        pass
+        for rec in self:
+            rec.write({'state': 'in_progress'})
 
     def action_resolve(self):
-        pass
+        for rec in self:
+            rec.write({'state': 'resolved'})
 
     def action_close(self):
-        pass
+        for rec in self:
+            rec.write({'state': 'closed'})
 
     def action_cancel(self):
-        pass
+        for rec in self:
+            rec.write({'state': 'cancelled'})
 
     def action_view_jobs(self):
-        pass
+        for rec in self:
+            # rec.write({'state': 'open'})
+            pass
 

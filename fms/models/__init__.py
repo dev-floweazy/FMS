@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+from . import res_partner
 from . import fms_ticket
 from . import fms_job
 from . import fms_site

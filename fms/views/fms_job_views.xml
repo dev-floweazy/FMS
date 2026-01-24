@@ -85,7 +85,7 @@
                     <notebook>
                         <page string="Job Details" name="job_lines">
                             <field name="job_line_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
 <!--                                    <field name="product_id" domain="[('is_fms_service', '=', True)]"/>-->
                                     <field name="description"/>
                                     <field name="quantity"/>
@@ -96,7 +96,7 @@
                                     <field name="subtotal_price" sum="Total Price"/>
                                     <field name="margin" sum="Margin"/>
                                     <field name="currency_id" invisible="1"/>
-                                </tree>
+                                </list>
                             </field>
                             <group class="oe_subtotal_footer oe_right">
                                 <field name="total_cost" widget="monetary"/>
@@ -226,4 +226,18 @@
 <!--            </search>-->
 <!--        </field>-->
 <!--    </record>-->
+
+    <record id="action_fms_job" model="ir.actions.act_window">
+        <field name="name">Sites</field>
+        <field name="res_model">fms.job</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add your first job
+            </p>
+            <p>
+<!--                add description-->
+            </p>
+        </field>
+    </record>
 </odoo>
