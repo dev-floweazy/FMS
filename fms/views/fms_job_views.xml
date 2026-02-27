@@ -88,6 +88,7 @@
                                 <list editable="bottom">
 <!--                                    <field name="product_id" domain="[('is_fms_service', '=', True)]"/>-->
                                     <field name="description"/>
+                                    <field name="product_id"/>
                                     <field name="quantity"/>
                                     <field name="uom_id"/>
                                     <field name="unit_cost"/>
