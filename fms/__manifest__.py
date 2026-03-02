@@ -71,6 +71,7 @@ Multi-Tenant Ready:
         # 'security/fms_security.xml',
         'security/ir.model.access.csv',
         'data/fms_sequence.xml',
+        'data/job_name.xml',
         'views/fms_service_category_views.xml',
         'views/fms_site_views.xml',
         'views/fms_rate_card_views.xml',

@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models
 
+
 class FMSTicket(models.Model):
     _name = 'fms.ticket'
     _description = 'FMS Ticket'
@@ -40,8 +41,14 @@ class FMSTicket(models.Model):
     # , compute = '_compute_sla'
 
     job_ids = fields.One2many('fms.job', 'ticket_id', string='Jobs')
+
+    job_count = fields.Integer(
+        'Jobs count',
+        compute='_compute_job_count',
+        store=True
+    )
+
     assigned_to_id = fields.Many2one('res.users', string='Assigned To')
-    job_count = fields.Integer('Jobs count')
     contact_person = fields.Char('Contact Person')
     contact_phone = fields.Char('Contact Phone')
     vendor_id = fields.Many2one('res.partner', string='Vendor Id')
@@ -74,10 +81,17 @@ class FMSTicket(models.Model):
             # SLA calculation logic based on category and priority
             pass
 
+    # ------------------------------------------------------------
+    # COMPUTE JOB COUNT
+    # ------------------------------------------------------------
+    @api.depends('job_ids')
+    def _compute_job_count(self):
+        for rec in self:
+            rec.job_count = len(rec.job_ids)
+
     def action_open(self):
         for rec in self:
             rec.write({'state': 'open'})
-
 
     def action_assign(self):
         for rec in self:
@@ -99,8 +113,59 @@ class FMSTicket(models.Model):
         for rec in self:
             rec.write({'state': 'cancelled'})
 
+    # ------------------------------------------------------------
+    # SMART BUTTON : JOBS
+    # ------------------------------------------------------------
     def action_view_jobs(self):
-        for rec in self:
-            # rec.write({'state': 'open'})
-            pass
+        self.ensure_one()
 
+        Job = self.env['fms.job']
+
+        # ------------------------------------------------
+        # If jobs already exist → just open them
+        # ------------------------------------------------
+        if self.job_ids:
+
+            # If only one job → open form
+            if len(self.job_ids) == 1:
+                return {
+                    'type': 'ir.actions.act_window',
+                    'name': 'Job',
+                    'res_model': 'fms.job',
+                    'view_mode': 'form',
+                    'res_id': self.job_ids.id,
+                    'target': 'current',
+                }
+
+            # If more than one job → open list
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Jobs',
+                'res_model': 'fms.job',
+                'view_mode': 'list,form',
+                'domain': [('id', 'in', self.job_ids.ids)],
+                'target': 'current',
+            }
+
+        # ------------------------------------------------
+        # No job exists yet → create first job
+        # ------------------------------------------------
+
+        job_vals = {
+            'ticket_id': self.id,
+            'vendor_id': self.vendor_id.id,
+            'assigned_user_id': self.assigned_to_id.id,
+            'scheduled_date': self.scheduled_date,
+            'description': self.description,
+        }
+
+        job = Job.create(job_vals)
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Job',
+            'res_model': 'fms.job',
+            'view_mode': 'form',
+            'res_id': job.id,
+            'target': 'current',
+        }

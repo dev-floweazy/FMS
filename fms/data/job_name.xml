@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="seq_fms_job" model="ir.sequence">
+        <field name="name">FMS Job Sequence</field>
+        <field name="code">fms.job</field>
+        <field name="prefix">JOB/%(year)s/</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>
