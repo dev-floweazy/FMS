@@ -9,11 +9,18 @@ class FMSJob(models.Model):
     _description = 'FMS Job/Work Order'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Job Number', required=True, copy=False,
-                       default='New', readonly=True)
+    name = fields.Char(
+        string='Job Number',
+        required=True,
+        copy=False,
+        readonly=True,
+        default=lambda self: self.env['ir.sequence'].next_by_code('fms.job') or 'JOB'
+    )
     ticket_id = fields.Many2one('fms.ticket', string='Ticket', required=True)
     partner_id = fields.Many2one(related='ticket_id.partner_id', store=True)
     site_id = fields.Many2one(related='ticket_id.site_id', store=True)
+    service_category_id = fields.Many2one(
+        related='ticket_id.service_category_id', store=True)
 
     vendor_id = fields.Many2one(
         'res.partner',
@@ -48,6 +55,7 @@ class FMSJob(models.Model):
 
     currency_id = fields.Many2one(
         'res.currency',
+        required=True,
         default=lambda self: self.env.company.currency_id
     )
 
@@ -91,7 +99,7 @@ class FMSJob(models.Model):
             job.total_price = sum(job.job_line_ids.mapped('subtotal_price'))
             job.margin = job.total_price - job.total_cost
             job.margin_percent = (
-                job.margin / job.total_price * 100
+                job.margin / job.total_price
             ) if job.total_price else 0
 
     # ---------------------------------------------------------

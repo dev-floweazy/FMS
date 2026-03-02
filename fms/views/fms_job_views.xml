@@ -58,16 +58,25 @@
                             <field name="invoice_id" widget="statinfo" string="Invoice"/>
                         </button>
                     </div>
+
+                    <!-- Improved Job Number UI -->
                     <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
                         <h1>
-                            <field name="name" readonly="1"/>
+                            <field name="name"
+                                   readonly="1"
+                                   class="text-primary"
+                                   widget="copyclipboard"
+                                   placeholder="Job Number"/>
                         </h1>
                     </div>
+
                     <group>
                         <group>
                             <field name="ticket_id"/>
                             <field name="partner_id"/>
                             <field name="site_id"/>
+                            <field name="service_category_id"/>
                         </group>
                         <group>
 <!--                            domain="[('is_fms_vendor', '=', True)]"-->
@@ -229,7 +238,7 @@
 <!--    </record>-->
 
     <record id="action_fms_job" model="ir.actions.act_window">
-        <field name="name">Sites</field>
+        <field name="name">Jobs</field>
         <field name="res_model">fms.job</field>
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
