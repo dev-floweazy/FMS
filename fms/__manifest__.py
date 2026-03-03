@@ -78,6 +78,8 @@ Multi-Tenant Ready:
         'views/fms_ticket_views.xml',
         'views/fms_job_views.xml',
         'views/res_partner_views.xml',
+        'views/fms_ticket_sla_view.xml',
+        'views/fms_sla_rule_views.xml',
         'views/fms_menu.xml',
 
     ],

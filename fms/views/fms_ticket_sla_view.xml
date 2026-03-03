@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- SLA fields on Ticket form -->
+
+    <record id="view_fms_ticket_form_sla" model="ir.ui.view">
+        <field name="name">fms.ticket.form.sla</field>
+        <field name="model">fms.ticket</field>
+        <field name="inherit_id" ref="fms.view_fms_ticket_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add a new SLA page inside existing notebook -->
+            <xpath expr="//notebook" position="inside">
+
+                <page string="SLA">
+
+                    <group>
+                        <group>
+                            <field name="sla_rule_id" readonly="1"/>
+                            <field name="sla_start_datetime" readonly="1"/>
+                        </group>
+
+                        <group>
+                            <field name="sla_response_deadline" readonly="1"/>
+                            <field name="sla_resolution_deadline" readonly="1"/>
+                            <field name="sla_breached" readonly="1"/>
+                        </group>
+                    </group>
+
+                </page>
+
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

@@ -21,6 +21,13 @@
                 <field name="margin" sum="Margin" decoration-danger="margin &lt; 0" decoration-success="margin &gt; 0"/>
                 <field name="margin_percent" widget="percentage"/>
                 <field name="state"/>
+
+                <!-- SLA -->
+                <field name="sla_rule_id"/>
+                <field name="sla_response_deadline"/>
+                <field name="sla_resolution_deadline"/>
+                <field name="sla_breached"/>
+
                 <field name="currency_id" invisible="1"/>
             </list>
         </field>
@@ -88,6 +95,19 @@
 <!--                            attrs="{'readonly': [('state', '!=', 'completed')]}"-->
 <!--                            attrs="{'readonly': [('state', '!=', 'completed')]}"-->
                             <field name="end_date" />
+                        </group>
+                    </group>
+
+                    <!-- SLA INFORMATION -->
+                    <group string="SLA Information">
+                        <group>
+                            <field name="sla_rule_id" readonly="1"/>
+                            <field name="sla_start_datetime" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="sla_response_deadline" readonly="1"/>
+                            <field name="sla_resolution_deadline" readonly="1"/>
+                            <field name="sla_breached" readonly="1"/>
                         </group>
                     </group>
 
