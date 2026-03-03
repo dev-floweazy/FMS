@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fms_sla_rule_tree" model="ir.ui.view">
+        <field name="name">fms.sla.rule.tree</field>
+        <field name="model">fms.sla.rule</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="service_category_id"/>
+                <field name="priority"/>
+                <field name="response_time"/>
+                <field name="resolution_time"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fms_sla_rule_form" model="ir.ui.view">
+        <field name="name">fms.sla.rule.form</field>
+        <field name="model">fms.sla.rule</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="service_category_id"/>
+                        <field name="priority"/>
+                        <field name="response_time"/>
+                        <field name="resolution_time"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fms_sla_rule" model="ir.actions.act_window">
+        <field name="name">SLA Rules</field>
+        <field name="res_model">fms.sla.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

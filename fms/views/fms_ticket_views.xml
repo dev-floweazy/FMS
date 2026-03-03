@@ -34,10 +34,11 @@
 <!--                    states="draft" -->
                     <button name="action_open" string="Open Ticket" type="object" class="oe_highlight"/>
 <!--                     states="open"-->
+                    <button name="action_start" string="Start Work" type="object" />
+<!--                    states="in_progress"&ndash;&gt;-->
                     <button name="action_assign" string="Assign" type="object" class="oe_highlight"/>
 <!--                    states="assigned"-->
-                    <button name="action_start" string="Start Work" type="object" />
-<!--                     states="in_progress"-->
+
                     <button name="action_resolve" string="Mark Resolved" type="object" class="oe_highlight"/>
 <!--                     states="resolved"-->
                     <button name="action_close" string="Close" type="object"/>

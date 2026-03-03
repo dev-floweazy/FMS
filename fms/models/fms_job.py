@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from datetime import timedelta
 
 
 class FMSJob(models.Model):
@@ -89,8 +90,39 @@ class FMSJob(models.Model):
     customer_feedback = fields.Text('Customer Feedback')
     notes = fields.Html('Notes')
 
+    # ---------------------------------------------------------
+    # SLA
+    # ---------------------------------------------------------
 
+    sla_rule_id = fields.Many2one(
+        'fms.sla.rule',
+        compute='_compute_sla_rule',
+        store=True
+    )
+
+    sla_start_datetime = fields.Datetime(
+        readonly=True,
+        copy=False
+    )
+
+    sla_response_deadline = fields.Datetime(
+        compute='_compute_sla_deadlines',
+        store=True
+    )
+
+    sla_resolution_deadline = fields.Datetime(
+        compute='_compute_sla_deadlines',
+        store=True
+    )
+
+    sla_breached = fields.Boolean(
+        compute='_compute_sla_breached',
+        store=False
+    )
+
+    # ---------------------------------------------------------
     # COMPUTE TOTALS
+    # ---------------------------------------------------------
 
     @api.depends('job_line_ids.subtotal_cost', 'job_line_ids.subtotal_price')
     def _compute_totals(self):
@@ -103,8 +135,76 @@ class FMSJob(models.Model):
             ) if job.total_price else 0
 
     # ---------------------------------------------------------
+    # SLA rule selection
+    # ---------------------------------------------------------
+
+    @api.depends('service_category_id', 'ticket_id.priority')
+    def _compute_sla_rule(self):
+        for job in self:
+            priority = job.ticket_id.priority if job.ticket_id else False
+
+            job.sla_rule_id = self.env['fms.sla.rule'].search([
+                ('service_category_id', '=', job.service_category_id.id),
+                ('priority', '=', priority),
+                ('active', '=', True)
+            ], limit=1)
+
+    # ---------------------------------------------------------
+    # SLA start at job creation
+    # ---------------------------------------------------------
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+
+        now = fields.Datetime.now()
+        for job in records:
+            if job.sla_rule_id:
+                job.sla_start_datetime = now
+
+        return records
+
+    # ---------------------------------------------------------
+    # SLA deadlines
+    # ---------------------------------------------------------
+
+    @api.depends('sla_start_datetime', 'sla_rule_id')
+    def _compute_sla_deadlines(self):
+
+        for job in self:
+
+            job.sla_response_deadline = False
+            job.sla_resolution_deadline = False
+
+            if not job.sla_start_datetime or not job.sla_rule_id:
+                continue
+
+            job.sla_response_deadline = job.sla_start_datetime + timedelta(
+                hours=job.sla_rule_id.response_time
+            )
+
+            job.sla_resolution_deadline = job.sla_start_datetime + timedelta(
+                hours=job.sla_rule_id.resolution_time
+            )
+
+    # ---------------------------------------------------------
+    # SLA breach
+    # ---------------------------------------------------------
+
+    def _compute_sla_breached(self):
+
+        now = fields.Datetime.now()
+
+        for job in self:
+            job.sla_breached = False
+
+            if job.sla_resolution_deadline and now > job.sla_resolution_deadline:
+                job.sla_breached = True
+
+    # ---------------------------------------------------------
     # PLACEHOLDER METHODS (kept as you asked)
     # ---------------------------------------------------------
+
     def action_create_sale_order(self):
         # Create SO from job lines
         pass
@@ -131,7 +231,6 @@ class FMSJob(models.Model):
     def action_cancel(self):
         pass
 
-
     # Smart button : Create / Open Sales Order
 
     def action_view_sale_order(self):
@@ -151,8 +250,6 @@ class FMSJob(models.Model):
 
                 if not line.product_id:
                     raise UserError("Please select product in all job lines.")
-
-
 
                 # Job line unit_price → SO line price_unit
 
@@ -185,7 +282,6 @@ class FMSJob(models.Model):
             'res_id': self.sale_order_id.id,
             'target': 'current',
         }
-
 
     # Smart button : Create / Open Purchase Order
 
@@ -240,7 +336,6 @@ class FMSJob(models.Model):
             'target': 'current',
         }
 
-
     # Smart button : Open Customer Invoice
 
     def action_view_invoice(self):
@@ -275,8 +370,9 @@ class FMSJob(models.Model):
         pass
 
 
-
+# ---------------------------------------------------------
 # Job Lines model
+# ---------------------------------------------------------
 
 
 class FMSJobLine(models.Model):
@@ -322,7 +418,6 @@ class FMSJobLine(models.Model):
         store=True
     )
 
-
     # COMPUTE LINE TOTALS
 
     @api.depends('quantity', 'unit_cost', 'unit_price')
@@ -332,7 +427,6 @@ class FMSJobLine(models.Model):
             line.subtotal_price = line.quantity * line.unit_price
             line.margin = line.subtotal_price - line.subtotal_cost
 
-
     # ONCHANGE PRODUCT
 
     @api.onchange('product_id')
@@ -341,8 +435,7 @@ class FMSJobLine(models.Model):
             self.uom_id = self.product_id.uom_id
 
             # ---------------------------------------------------------
-            # LOGIC:
-            # Fetch customer specific rate card
+            # EXISTING LOGIC (kept as is)
             # ---------------------------------------------------------
             rate_card = self.env['fms.rate.card'].search([
                 ('partner_id', '=', self.job_id.partner_id.id),
@@ -351,3 +444,26 @@ class FMSJobLine(models.Model):
 
             if rate_card:
                 self.unit_price = rate_card.unit_price
+
+            # ---------------------------------------------------------
+            # NEW LOGIC ADDED (as you asked)
+            # Using get_rate_for_customer()
+            # ---------------------------------------------------------
+            partner_id = self.job_id.partner_id.id
+            product_id = self.product_id.id
+
+            # job date used for validity check
+            job_date = (
+                self.job_id.scheduled_date.date()
+                if self.job_id.scheduled_date
+                else fields.Date.context_today(self)
+            )
+
+            rate = self.env['fms.rate.card'].get_rate_for_customer(
+                partner_id,
+                product_id,
+                job_date
+            )
+
+            if rate:
+                self.unit_price = rate.unit_price

@@ -2,8 +2,8 @@
 <odoo>
 
 <!-- ============================================ -->
-    <!-- SITE VIEWS -->
-    <!-- ============================================ -->
+<!-- SITE VIEWS -->
+<!-- ============================================ -->
 
     <record id="view_fms_site_list" model="ir.ui.view">
         <field name="name">fms.site.list</field>
@@ -28,20 +28,38 @@
         <field name="arch" type="xml">
             <form string="Site">
                 <sheet>
+
                     <div class="oe_button_box" name="button_box">
-                        <button name="action_view_tickets" type="object" class="oe_stat_button" icon="fa-ticket">
-                            <field name="ticket_count" widget="statinfo" string="Tickets"/>
+                        <button name="action_view_tickets"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-ticket">
+                            <field name="ticket_count"
+                                   widget="statinfo"
+                                   string="Tickets"/>
                         </button>
-                        <button name="action_view_jobs" type="object" class="oe_stat_button" icon="fa-tasks">
-                            <field name="job_count" widget="statinfo" string="Jobs"/>
+
+                        <button name="action_view_jobs"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-tasks">
+                            <field name="job_count"
+                                   widget="statinfo"
+                                   string="Jobs"/>
                         </button>
                     </div>
-                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
+
+                    <widget name="web_ribbon"
+                            title="Archived"
+                            bg_color="bg-danger"
+                            invisible="active"/>
+
                     <div class="oe_title">
                         <h1>
                             <field name="name" placeholder="Site Name"/>
                         </h1>
                     </div>
+
                     <group>
                         <group>
                             <field name="code"/>
@@ -54,6 +72,7 @@
                             <field name="contact_email" widget="email"/>
                         </group>
                     </group>
+
                     <group string="Address">
                         <group>
                             <field name="street" placeholder="Street..."/>
@@ -66,93 +85,96 @@
                             <field name="country_id"/>
                         </group>
                     </group>
+
                     <group string="Additional Info">
-                        <field name="notes" placeholder="Site-specific notes, access instructions, etc."/>
+                        <field name="notes"
+                               placeholder="Site-specific notes, access instructions, etc."/>
                     </group>
+
                 </sheet>
             </form>
         </field>
     </record>
 
+
     <record id="view_fms_site_kanban" model="ir.ui.view">
-    <field name="name">fms.site.kanban</field>
-    <field name="model">fms.site</field>
-    <field name="arch" type="xml">
-        <kanban class="o_kanban_small_column">
-            <field name="name"/>
-            <field name="code"/>
-            <field name="partner_id"/>
-            <field name="city"/>
-            <field name="state_id"/>
-            <field name="country_id"/>
-            <field name="ticket_count"/>
-            <field name="job_count"/>
-            <field name="active"/>
+        <field name="name">fms.site.kanban</field>
+        <field name="model">fms.site</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="partner_id"/>
+                <field name="city"/>
+                <field name="state_id"/>
+                <field name="country_id"/>
+                <field name="ticket_count"/>
+                <field name="job_count"/>
+                <field name="active"/>
 
-            <templates>
-                <!-- IMPORTANT: must be 'card' -->
-                <t t-name="card">
-                    <div class="oe_kanban_global_click o_kanban_card">
+                <templates>
+                    <!-- IMPORTANT: must be 'card' -->
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click o_kanban_card">
 
-                        <!-- Archived ribbon -->
-                        <t t-if="!record.active.raw_value">
-                            <div class="o_kanban_ribbon bg-danger">
-                                <span>Archived</span>
+                            <!-- Archived ribbon -->
+                            <t t-if="!record.active.raw_value">
+                                <div class="o_kanban_ribbon bg-danger">
+                                    <span>Archived</span>
+                                </div>
+                            </t>
+
+                            <!-- Header -->
+                            <div class="o_kanban_header">
+                                <strong class="o_kanban_record_title">
+                                    <t t-esc="record.name.value"/>
+                                </strong>
+                                <div t-if="record.code.value" class="text-muted">
+                                    <small>[<t t-esc="record.code.value"/>]</small>
+                                </div>
                             </div>
-                        </t>
 
-                        <!-- Header -->
-                        <div class="o_kanban_header">
-                            <strong class="o_kanban_record_title">
-                                <t t-esc="record.name.value"/>
-                            </strong>
-                            <div t-if="record.code.value" class="text-muted">
-                                <small>[<t t-esc="record.code.value"/>]</small>
+                            <!-- Body -->
+                            <div class="o_kanban_content mt-2">
+                                <div t-if="record.partner_id.value">
+                                    <i class="fa fa-user me-1"/>
+                                    <t t-esc="record.partner_id.value"/>
+                                </div>
+
+                                <div class="mt-1 text-muted">
+                                    <t t-if="record.city.value">
+                                        <t t-esc="record.city.value"/>
+                                    </t>
+                                    <t t-if="record.state_id.value">
+                                        , <t t-esc="record.state_id.value"/>
+                                    </t>
+                                    <t t-if="record.country_id.value">
+                                        , <t t-esc="record.country_id.value"/>
+                                    </t>
+                                </div>
                             </div>
+
+                            <!-- Footer -->
+                            <div class="o_kanban_footer mt-2 d-flex justify-content-between">
+                                <span>
+                                    <i class="fa fa-ticket me-1"/>
+                                    <t t-esc="record.ticket_count.value"/>
+                                </span>
+                                <span>
+                                    <i class="fa fa-tasks me-1"/>
+                                    <t t-esc="record.job_count.value"/>
+                                </span>
+                            </div>
+
                         </div>
-
-                        <!-- Body -->
-                        <div class="o_kanban_content mt-2">
-                            <div t-if="record.partner_id.value">
-                                <i class="fa fa-user me-1"/>
-                                <t t-esc="record.partner_id.value"/>
-                            </div>
-
-                            <div class="mt-1 text-muted">
-                                <t t-if="record.city.value">
-                                    <t t-esc="record.city.value"/>
-                                </t>
-                                <t t-if="record.state_id.value">
-                                    , <t t-esc="record.state_id.value"/>
-                                </t>
-                                <t t-if="record.country_id.value">
-                                    , <t t-esc="record.country_id.value"/>
-                                </t>
-                            </div>
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="o_kanban_footer mt-2 d-flex justify-content-between">
-                            <span>
-                                <i class="fa fa-ticket me-1"/>
-                                <t t-esc="record.ticket_count.value"/>
-                            </span>
-                            <span>
-                                <i class="fa fa-tasks me-1"/>
-                                <t t-esc="record.job_count.value"/>
-                            </span>
-                        </div>
-
-                    </div>
-                </t>
-            </templates>
-        </kanban>
-    </field>
-</record>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
 
 
-
-     <record id="action_fms_site" model="ir.actions.act_window">
+    <record id="action_fms_site" model="ir.actions.act_window">
         <field name="name">Sites</field>
         <field name="res_model">fms.site</field>
         <field name="view_mode">kanban,list,form</field>
@@ -166,4 +188,5 @@
             </p>
         </field>
     </record>
+
 </odoo>
