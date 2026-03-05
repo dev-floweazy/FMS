@@ -18,3 +18,15 @@ class FMSServiceCategory(models.Model):
     product_id = fields.Many2one('product.product', string='Product')
     standard_price = fields.Float(related='product_id.standard_price', string='Standard Price')
     list_price = fields.Float('Price', digits='Product Price', required=True, default=0.0)
+    response_time = fields.Float(
+        string='Response Time (Hours)',
+        required=True)
+    resolution_time = fields.Float(
+        string='Resolution Time (Hours)',
+        required=True)
+    priority = fields.Selection([
+        ('0', 'Low'),
+        ('1', 'Normal'),
+        ('2', 'High'),
+        ('3', 'Urgent')
+    ], default='1', tracking=True)
