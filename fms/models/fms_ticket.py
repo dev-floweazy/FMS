@@ -25,8 +25,8 @@ class FMSTicket(models.Model):
 
     description = fields.Html(string='Issue Description')
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('open', 'Open'),
+        # ('draft', 'Draft'),
+        # ('open', 'Open'),
         ('assigned', 'Assigned'),
         ('in_progress', 'In Progress'),
         ('pending', 'Pending'),
@@ -50,6 +50,8 @@ class FMSTicket(models.Model):
 
     assigned_to_id = fields.Many2one('res.users', string='Assigned To')
     contact_person = fields.Char('Contact Person')
+    work_start_datetime = fields.Datetime(string="Work Start Time", tracking=True)
+    work_stop_datetime = fields.Datetime(string="Work Stop Time", tracking=True)
     contact_phone = fields.Char('Contact Phone')
     vendor_id = fields.Many2one('res.partner', string='Vendor Id')
     scheduled_date = fields.Date('Scheduled Date')
@@ -99,7 +101,19 @@ class FMSTicket(models.Model):
 
     def action_start(self):
         for rec in self:
-            rec.write({'state': 'in_progress'})
+            rec.write({
+                'state': 'in_progress',
+                'work_start_datetime': fields.Datetime.now(),
+                'work_stop_datetime': False,
+            })
+
+    def action_stop(self):
+        for rec in self:
+            rec.write({
+                'state': 'pending',
+                'work_stop_datetime': fields.Datetime.now(),
+                'work_start_datetime': False,
+            })
 
     def action_resolve(self):
         for rec in self:

@@ -13,7 +13,10 @@
                 <field name="code"/>
                 <field name="parent_id"/>
                 <field name="default_sla_hours"/>
+                <field name="priority" widget="priority"/>
                 <field name="active"/>
+                <field name="response_time"/>
+                <field name="resolution_time"/>
             </list>
         </field>
     </record>
@@ -30,10 +33,13 @@
                             <field name="name"/>
                             <field name="code"/>
                             <field name="parent_id"/>
+                            <field name="priority" widget="priority"/>
                         </group>
                         <group>
                             <field name="default_sla_hours"/>
                             <field name="active"/>
+                            <field name="response_time"/>
+                            <field name="resolution_time"/>
                         </group>
                     </group>
                     <notebook>
