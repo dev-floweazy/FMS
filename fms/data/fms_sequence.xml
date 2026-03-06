@@ -7,5 +7,12 @@
             <field name="prefix">TKT-%(year)s%(month)s-</field>
             <field name="padding">4</field>
         </record>
+
+        <record id="seq_fms_scope_approval" model="ir.sequence">
+            <field name="name">FMS Scope Approval</field>
+            <field name="code">fms.scope.approval</field>
+            <field name="prefix">SCOPE/%(year)s/</field>
+            <field name="padding">4</field>
+        </record>
     </data>
 </odoo>

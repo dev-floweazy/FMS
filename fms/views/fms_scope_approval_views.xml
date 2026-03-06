@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══════════════════════════
+         APPROVAL RULE VIEWS
+    ═══════════════════════════ -->
+    <record id="view_fms_approval_rule_list" model="ir.ui.view">
+        <field name="name">fms.approval.rule.list</field>
+        <field name="model">fms.approval.rule</field>
+        <field name="arch" type="xml">
+            <list string="Approval Rules">
+                <field name="name"/>
+                <field name="amount_threshold" widget="monetary"/>
+                <field name="approver_id"/>
+                <field name="approver_group_id"/>
+                <field name="active"/>
+                <field name="currency_id" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fms_approval_rule_form" model="ir.ui.view">
+        <field name="name">fms.approval.rule.form</field>
+        <field name="model">fms.approval.rule</field>
+        <field name="arch" type="xml">
+            <form string="Approval Rule">
+                <sheet>
+                    <group>
+                        <group string="Trigger Condition">
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="amount_threshold" widget="monetary"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Approver">
+                            <field name="approver_id"/>
+                            <field name="approver_group_id"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"
+                               placeholder="Optional notes about this rule..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fms_approval_rule" model="ir.actions.act_window">
+        <field name="name">Scope Approval Rules</field>
+        <field name="res_model">fms.approval.rule</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- ═══════════════════════════
+         SCOPE APPROVAL LIST VIEW
+    ═══════════════════════════ -->
+    <record id="view_fms_scope_approval_list" model="ir.ui.view">
+        <field name="name">fms.scope.approval.list</field>
+        <field name="model">fms.scope.approval</field>
+        <field name="arch" type="xml">
+            <list string="Scope Approvals"
+                  decoration-warning="state=='pending'"
+                  decoration-success="state=='approved'"
+                  decoration-danger="state=='rejected'">
+                <field name="name"/>
+                <field name="job_id"/>
+                <field name="partner_id"/>
+                <field name="approver_id"/>
+                <field name="requested_by_id"/>
+                <field name="total_additional_amount" widget="monetary"/>
+                <field name="state"
+                       widget="badge"
+                       decoration-warning="state=='pending'"
+                       decoration-success="state=='approved'"
+                       decoration-danger="state=='rejected'"/>
+                <field name="approve_date"/>
+                <field name="currency_id" invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════
+         SCOPE APPROVAL FORM VIEW
+    ═══════════════════════════ -->
+    <record id="view_fms_scope_approval_form" model="ir.ui.view">
+        <field name="name">fms.scope.approval.form</field>
+        <field name="model">fms.scope.approval</field>
+        <field name="arch" type="xml">
+            <form string="Additional Scope Approval">
+                <header>
+                    <button name="action_approve"
+                            string="Approve"
+                            type="object"
+                            invisible="state != 'pending'"
+                            class="btn-success"/>
+                    <button name="action_reject"
+                            string="Reject"
+                            type="object"
+                            invisible="state != 'pending'"
+                            class="btn-danger"/>
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="pending,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-cart"
+                                invisible="not sale_order_id">
+                            <field name="sale_order_id"
+                                   widget="statinfo"
+                                   string="Sales Order"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group string="Job Information">
+                            <field name="job_id" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="vendor_id" readonly="1"/>
+                            <field name="approval_rule_id" readonly="1"/>
+                        </group>
+                        <group string="Approval Information">
+                            <field name="approver_id" readonly="1"/>
+                            <field name="requested_by_id" readonly="1"/>
+                            <field name="total_additional_amount"
+                                   widget="monetary" readonly="1"/>
+                            <field name="approve_date" readonly="1"
+                                   invisible="not approve_date"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Additional Scope Lines">
+                            <field name="approval_line_ids" readonly="1">
+                                <list>
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="quantity"/>
+                                    <field name="uom_id"/>
+                                    <field name="unit_price" widget="monetary"/>
+                                    <field name="subtotal_price"
+                                           widget="monetary"
+                                           sum="Total"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Decision Notes"
+                              invisible="state == 'pending'">
+                            <group>
+                                <field name="approver_notes"
+                                       invisible="state != 'approved'"
+                                       placeholder="Approver notes..."/>
+                                <field name="rejection_reason"
+                                       readonly="1"
+                                       invisible="state != 'rejected'"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════
+         SCOPE APPROVAL SEARCH VIEW
+    ═══════════════════════════ -->
+    <record id="view_fms_scope_approval_search" model="ir.ui.view">
+        <field name="name">fms.scope.approval.search</field>
+        <field name="model">fms.scope.approval</field>
+        <field name="arch" type="xml">
+            <search string="Scope Approvals">
+                <field name="name" string="Reference"/>
+                <field name="job_id" string="Job"/>
+                <field name="partner_id" string="Customer"/>
+                <field name="approver_id" string="Approver"/>
+                <filter name="pending" string="Pending" domain="[('state','=','pending')]"/>
+                <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state','=','rejected')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════
+         SCOPE APPROVAL ACTION
+    ═══════════════════════════ -->
+    <record id="action_fms_scope_approval" model="ir.actions.act_window">
+        <field name="name">Scope Approvals</field>
+        <field name="res_model">fms.scope.approval</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_fms_scope_approval_search"/>
+        <field name="context">{'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No scope approval requests yet.
+            </p>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════
+         REJECTION WIZARD
+    ═══════════════════════════ -->
+    <record id="view_fms_scope_rejection_wizard_form" model="ir.ui.view">
+        <field name="name">fms.scope.rejection.wizard.form</field>
+        <field name="model">fms.scope.rejection.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject Additional Scope">
+                <group>
+                    <field name="approval_id" invisible="1"/>
+                    <field name="rejection_reason"
+                           placeholder="Please provide a reason for rejection..."
+                           required="1"/>
+                </group>
+                <footer>
+                    <button name="action_confirm_reject"
+                            string="Confirm Rejection"
+                            type="object"
+                            class="btn-danger"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
