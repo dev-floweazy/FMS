@@ -25,7 +25,7 @@ class FMSTicket(models.Model):
 
     description = fields.Html(string='Issue Description')
     state = fields.Selection([
-        # ('draft', 'Draft'),
+        ('draft', 'Draft'),
         # ('open', 'Open'),
         ('assigned', 'Assigned'),
         ('in_progress', 'In Progress'),

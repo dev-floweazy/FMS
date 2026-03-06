@@ -8,3 +8,7 @@ fms.access_fms_job,access_fms_job,fms.model_fms_job,base.group_user,1,1,1,1
 fms.access_fms_job_line,access_fms_job_line,fms.model_fms_job_line,base.group_user,1,1,1,1
 fms.access_fms_site,access_fms_site,fms.model_fms_site,base.group_user,1,1,1,1
 fms.access_fms_sla_rule,access_fms_sla_rule,fms.model_fms_sla_rule,base.group_user,1,1,1,1
+fms.access_fms_approval_rule,access_fms_approval_rule,fms.model_fms_approval_rule,base.group_user,1,1,1,1
+fms.access_fms_scope_approval,access_fms_scope_approval,fms.model_fms_scope_approval,base.group_user,1,1,1,1
+fms.access_fms_scope_approval_line,access_fms_scope_approval_line,fms.model_fms_scope_approval_line,base.group_user,1,1,1,1
+fms.access_fms_scope_rejection_wizard,access_fms_scope_rejection_wizard,fms.model_fms_scope_rejection_wizard,base.group_user,1,1,1,1
