@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="partner_tag_fms_customer" model="res.partner.category">
+            <field name="name">FMS Customer</field>
+            <field name="color">1</field>
+        </record>
+        <record id="partner_tag_fms_vendor" model="res.partner.category">
+            <field name="name">FMS Vendor</field>
+            <field name="color">10</field>
+        </record>
+    </data>
+</odoo>

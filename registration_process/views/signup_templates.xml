@@ -1,0 +1,625 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+
+<!-- ═══════════════════════════════════════════════════════════
+     1. LANDING PAGE  — YOUR EXACT ORIGINAL DESIGN, UNCHANGED
+        Only change: button hrefs now point to /fms/signup/*
+═══════════════════════════════════════════════════════════ -->
+<template id="fms_signup_landing" name="Facility Management Signup Landing">
+    <t t-call="web.layout">
+        <t t-set="head">
+            <title>Sign Up — FacilityPro</title>
+            <link rel="preconnect" href="https://fonts.googleapis.com"/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+            <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&amp;family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&amp;display=swap" rel="stylesheet"/>
+            <link rel="stylesheet" href="/web/static/lib/fontawesome/css/font-awesome.css"/>
+            <style>
+                *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+                :root {
+                    --navy:#0a1628; --navy2:#0f2040; --steel:#1a3a5c;
+                    --sky:#0ea5e9; --teal:#06b6d4; --green:#10b981;
+                    --amber:#f59e0b; --slate:#64748b; --light:#f1f5f9;
+                    --white:#ffffff; --radius:16px;
+                }
+                html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--navy); color:var(--white); overflow-x:hidden; }
+                .fms-bg { position:fixed; inset:0; z-index:0;
+                    background: radial-gradient(ellipse 80% 60% at 10% 20%,rgba(14,165,233,.18) 0%,transparent 60%),
+                                radial-gradient(ellipse 60% 50% at 90% 80%,rgba(16,185,129,.12) 0%,transparent 55%),
+                                radial-gradient(ellipse 50% 40% at 50% 50%,rgba(6,182,212,.07) 0%,transparent 70%),
+                                var(--navy);
+                    animation:bgShift 18s ease-in-out infinite alternate; }
+                @keyframes bgShift { 0%{background-position:0% 0%} 100%{background-position:100% 100%} }
+                .fms-bg::before { content:''; position:absolute; inset:0;
+                    background-image: linear-gradient(rgba(14,165,233,.06) 1px,transparent 1px),
+                                      linear-gradient(90deg,rgba(14,165,233,.06) 1px,transparent 1px);
+                    background-size:56px 56px; }
+                .orb { position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; animation:orbFloat 14s ease-in-out infinite alternate; }
+                .orb-1 { width:480px; height:480px; background:rgba(14,165,233,.12); top:-120px; left:-100px; }
+                .orb-2 { width:360px; height:360px; background:rgba(16,185,129,.10); bottom:-80px; right:-80px; animation-delay:-7s; }
+                @keyframes orbFloat { from{transform:translate(0,0)} to{transform:translate(40px,30px)} }
+                .fms-page { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:3rem 1.5rem; }
+                .fms-brand { text-align:center; margin-bottom:3rem; animation:fadeDown .6s ease both; }
+                .fms-logo { display:inline-flex; align-items:center; gap:12px; margin-bottom:1rem; }
+                .fms-logo-icon { width:48px; height:48px; background:linear-gradient(135deg,var(--sky),var(--teal)); border-radius:13px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 28px rgba(14,165,233,.4); }
+                .fms-logo-icon i { color:#fff; font-size:1.35rem; }
+                .fms-logo-text { font-family:'Outfit',sans-serif; font-size:1.6rem; font-weight:800; letter-spacing:-0.5px; color:var(--white); }
+                .fms-logo-text span { color:var(--sky); }
+                .fms-tagline { font-size:0.92rem; color:rgba(255,255,255,.45); letter-spacing:0.04em; font-weight:300; }
+                .fms-headline { text-align:center; margin-bottom:3rem; animation:fadeDown .7s .1s ease both; }
+                .fms-headline h1 { font-family:'Outfit',sans-serif; font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; letter-spacing:-1.5px; line-height:1.1; color:var(--white); }
+                .fms-headline h1 em { font-style:normal; background:linear-gradient(90deg,var(--sky),var(--teal)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+                .fms-headline p { margin-top:0.75rem; font-size:1rem; color:rgba(255,255,255,.5); font-weight:300; }
+                .fms-cards { display:flex; flex-wrap:nowrap; gap:1.5rem; width:100%; max-width:760px; }
+                .fms-card { flex:1 1 0%; min-width:0; border-radius:20px; padding:2.25rem 1.75rem; display:flex; flex-direction:column; align-items:flex-start; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.05); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease; cursor:default; animation:fadeUp .6s ease both; }
+                .fms-card:nth-child(2) { animation-delay:.12s; }
+                .fms-card::before { content:''; position:absolute; inset:0; border-radius:20px; opacity:0; transition:opacity .3s; }
+                .fms-card:hover { transform:translateY(-8px); }
+                .fms-card-customer::before { background:linear-gradient(135deg,rgba(14,165,233,.15),transparent 60%); }
+                .fms-card-customer:hover { border-color:rgba(14,165,233,.4); box-shadow:0 20px 60px rgba(14,165,233,.18),0 0 0 1px rgba(14,165,233,.15); }
+                .fms-card-customer:hover::before { opacity:1; }
+                .fms-card-vendor::before { background:linear-gradient(135deg,rgba(16,185,129,.15),transparent 60%); }
+                .fms-card-vendor:hover { border-color:rgba(16,185,129,.4); box-shadow:0 20px 60px rgba(16,185,129,.18),0 0 0 1px rgba(16,185,129,.15); }
+                .fms-card-vendor:hover::before { opacity:1; }
+                .fms-card-deco { position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%; opacity:0.07; }
+                .fms-card-customer .fms-card-deco { background:var(--sky); }
+                .fms-card-vendor   .fms-card-deco { background:var(--green); }
+                .fms-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:40px; font-size:0.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:1.5rem; position:relative; z-index:1; }
+                .badge-blue  { background:rgba(14,165,233,.15); color:#7dd3fc; border:1px solid rgba(14,165,233,.25); }
+                .badge-green { background:rgba(16,185,129,.15); color:#6ee7b7; border:1px solid rgba(16,185,129,.25); }
+                .fms-badge::before { content:'●'; font-size:7px; animation:blink 2s infinite; }
+                @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+                .fms-icon-box { width:58px; height:58px; border-radius:15px; display:flex; align-items:center; justify-content:center; margin-bottom:1.25rem; position:relative; z-index:1; flex-shrink:0; }
+                .icon-blue  { background:linear-gradient(135deg,rgba(14,165,233,.25),rgba(6,182,212,.15)); border:1px solid rgba(14,165,233,.3); box-shadow:0 4px 20px rgba(14,165,233,.15); }
+                .icon-green { background:linear-gradient(135deg,rgba(16,185,129,.25),rgba(5,150,105,.15)); border:1px solid rgba(16,185,129,.3); box-shadow:0 4px 20px rgba(16,185,129,.15); }
+                .fms-icon-box i { font-size:1.4rem; }
+                .icon-blue i { color:#7dd3fc; }
+                .icon-green i { color:#6ee7b7; }
+                .fms-card-title { font-family:'Outfit',sans-serif; font-size:1.3rem; font-weight:700; color:var(--white); letter-spacing:-0.3px; margin-bottom:0.5rem; position:relative; z-index:1; }
+                .fms-card-desc { font-size:0.88rem; color:rgba(255,255,255,.5); line-height:1.6; margin-bottom:1.75rem; flex-grow:1; font-weight:300; position:relative; z-index:1; }
+                .fms-pills { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:1.75rem; position:relative; z-index:1; }
+                .fms-pill { padding:4px 10px; border-radius:6px; font-size:0.72rem; font-weight:500; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); color:rgba(255,255,255,.6); letter-spacing:.02em; }
+                .fms-cta { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:0.85rem 1.25rem; border-radius:12px; font-family:'Outfit',sans-serif; font-size:0.95rem; font-weight:700; text-decoration:none !important; border:none; cursor:pointer; transition:transform .2s,box-shadow .2s,opacity .2s; position:relative; z-index:1; letter-spacing:.01em; }
+                .fms-cta:hover { transform:translateY(-2px); opacity:0.92; }
+                .fms-cta:active { transform:scale(0.98); }
+                .cta-blue  { background:linear-gradient(135deg,#0ea5e9,#06b6d4); color:#fff !important; box-shadow:0 8px 24px rgba(14,165,233,.35); }
+                .cta-blue:hover  { box-shadow:0 12px 32px rgba(14,165,233,.5); color:#fff !important; }
+                .cta-green { background:linear-gradient(135deg,#10b981,#059669); color:#fff !important; box-shadow:0 8px 24px rgba(16,185,129,.35); }
+                .cta-green:hover { box-shadow:0 12px 32px rgba(16,185,129,.5); color:#fff !important; }
+                .fms-cta i { font-size:0.85rem; transition:transform .2s; }
+                .fms-cta:hover i { transform:translateX(3px); }
+                .fms-signin { margin-top:2.25rem; text-align:center; font-size:0.88rem; color:rgba(255,255,255,.35); animation:fadeUp .6s .35s ease both; }
+                .fms-signin a { color:var(--sky); text-decoration:none; font-weight:500; }
+                .fms-signin a:hover { text-decoration:underline; }
+                .fms-trust { display:flex; align-items:center; justify-content:center; gap:1.5rem; margin-top:2.5rem; padding-top:2rem; border-top:1px solid rgba(255,255,255,.06); width:100%; max-width:760px; animation:fadeUp .6s .4s ease both; flex-wrap:wrap; }
+                .trust-item { display:flex; align-items:center; gap:7px; font-size:0.78rem; color:rgba(255,255,255,.3); font-weight:400; }
+                .trust-item i { color:var(--sky); font-size:0.8rem; }
+                @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+                @keyframes fadeUp   { from{opacity:0;transform:translateY(20px)}  to{opacity:1;transform:translateY(0)} }
+                @media (max-width:560px) {
+                    .fms-page{padding:2rem 1rem;} .fms-brand{margin-bottom:2rem;} .fms-headline{margin-bottom:2rem;}
+                    .fms-cards{flex-wrap:wrap;gap:1rem;} .fms-card{flex:1 1 100%;padding:1.75rem 1.25rem;} .fms-trust{gap:1rem;}
+                }
+            </style>
+        </t>
+
+        <div class="fms-bg"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+
+        <div class="fms-page">
+            <div class="fms-brand">
+                <div class="fms-logo">
+                    <div class="fms-logo-icon"><i class="fa fa-building"></i></div>
+                    <span class="fms-logo-text">Facility<span>Pro</span></span>
+                </div>
+                <p class="fms-tagline">Intelligent Facility Management Platform</p>
+            </div>
+
+            <div class="fms-headline">
+                <h1>Join the <em>smarter way</em><br/>to manage facilities</h1>
+                <p>Choose how you want to get started on the platform</p>
+            </div>
+
+            <div class="fms-cards">
+                <!-- CUSTOMER — href now points to dedicated route -->
+                <div class="fms-card fms-card-customer">
+                    <div class="fms-card-deco"></div>
+                    <span class="fms-badge badge-blue">For Organisations</span>
+                    <div class="fms-icon-box icon-blue"><i class="fa fa-building-o"></i></div>
+                    <div class="fms-card-title">I need facilities managed</div>
+                    <div class="fms-card-desc">Access professional facility services, submit work orders and track maintenance across all your properties in real time.</div>
+                    <div class="fms-pills">
+                        <span class="fms-pill">Work Orders</span>
+                        <span class="fms-pill">Asset Tracking</span>
+                        <span class="fms-pill">Compliance</span>
+                        <span class="fms-pill">Reports</span>
+                    </div>
+                    <a href="/fms/signup/customer" class="fms-cta cta-blue">
+                        Sign up as Customer <i class="fa fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- VENDOR — href now points to dedicated route -->
+                <div class="fms-card fms-card-vendor">
+                    <div class="fms-card-deco"></div>
+                    <span class="fms-badge badge-green">For Service Providers</span>
+                    <div class="fms-icon-box icon-green"><i class="fa fa-users"></i></div>
+                    <div class="fms-card-title">I provide facility services</div>
+                    <div class="fms-card-desc">Join our vendor network to receive service requests, submit quotes, manage jobs and grow your facility management business.</div>
+                    <div class="fms-pills">
+                        <span class="fms-pill">Receive Jobs</span>
+                        <span class="fms-pill">Invoicing</span>
+                        <span class="fms-pill">Scheduling</span>
+                        <span class="fms-pill">Portal</span>
+                    </div>
+                    <a href="/fms/signup/vendor" class="fms-cta cta-green">
+                        Sign up as Vendor <i class="fa fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="fms-signin">
+                Already have an account? <a href="/web/login">Sign in here</a>
+            </div>
+
+            <div class="fms-trust">
+                <div class="trust-item"><i class="fa fa-lock"></i> Secure &amp; Encrypted</div>
+                <div class="trust-item"><i class="fa fa-check-circle"></i> Free to Register</div>
+                <div class="trust-item"><i class="fa fa-bolt"></i> Powered by Odoo 19</div>
+                <div class="trust-item"><i class="fa fa-shield"></i> GDPR Compliant</div>
+            </div>
+        </div>
+    </t>
+</template>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SHARED FORM STYLES  (same dark theme as landing)
+═══════════════════════════════════════════════════════════ -->
+<template id="fms_form_styles" name="FMS Form Shared Styles">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&amp;family=DM+Sans:wght@300;400;500&amp;display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+    --navy:#0a1628; --sky:#0ea5e9; --teal:#06b6d4;
+    --green:#10b981; --red:#ef4444; --white:#ffffff;
+    --glass:rgba(255,255,255,0.06); --border:rgba(255,255,255,0.10);
+}
+html, body { min-height:100%; font-family:'DM Sans',sans-serif; background:var(--navy); color:var(--white); overflow-x:hidden; }
+
+/* Background — same as landing */
+.fms-bg { position:fixed; inset:0; z-index:0;
+    background: radial-gradient(ellipse 80% 60% at 10% 20%,rgba(14,165,233,.18) 0%,transparent 60%),
+                radial-gradient(ellipse 60% 50% at 90% 80%,rgba(16,185,129,.12) 0%,transparent 55%),
+                var(--navy); }
+.fms-bg::before { content:''; position:absolute; inset:0;
+    background-image: linear-gradient(rgba(14,165,233,.06) 1px,transparent 1px),
+                      linear-gradient(90deg,rgba(14,165,233,.06) 1px,transparent 1px);
+    background-size:56px 56px; }
+.orb { position:fixed; border-radius:50%; filter:blur(90px); pointer-events:none; z-index:0; animation:orbFloat 14s ease-in-out infinite alternate; }
+.orb-1 { width:480px; height:480px; background:rgba(14,165,233,.11); top:-120px; left:-100px; }
+.orb-2 { width:360px; height:360px; background:rgba(16,185,129,.09); bottom:-80px; right:-80px; animation-delay:-7s; }
+@keyframes orbFloat { from{transform:translate(0,0)} to{transform:translate(40px,30px)} }
+
+/* Page shell */
+.fms-page { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2.5rem 1.25rem; }
+
+/* Logo */
+.fms-logo-bar { display:inline-flex; align-items:center; gap:11px; text-decoration:none !important; margin-bottom:1.75rem; }
+.fms-logo-icon { width:42px; height:42px; background:linear-gradient(135deg,var(--sky),var(--teal)); border-radius:11px; display:flex; align-items:center; justify-content:center; box-shadow:0 0 22px rgba(14,165,233,.38); }
+.fms-logo-icon i { color:#fff; font-size:1.1rem; }
+.fms-logo-name { font-family:'Outfit',sans-serif; font-size:1.35rem; font-weight:800; letter-spacing:-.4px; color:var(--white); }
+.fms-logo-name span { color:var(--sky); }
+
+/* Form card */
+.fms-form-card { background:rgba(255,255,255,.05); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.09); border-radius:22px; padding:2.25rem 2rem; width:100%; max-width:560px; box-shadow:0 24px 64px rgba(0,0,0,.35); animation:fadeUp .5s ease both; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* Role badge */
+.fms-role-badge { display:inline-flex; align-items:center; gap:6px; padding:3px 12px; border-radius:40px; font-size:.68rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; margin-bottom:.6rem; }
+.badge-sky   { background:rgba(14,165,233,.15); color:#7dd3fc; border:1px solid rgba(14,165,233,.25); }
+.badge-green { background:rgba(16,185,129,.15); color:#6ee7b7; border:1px solid rgba(16,185,129,.25); }
+
+/* Heading */
+.fms-form-title { font-family:'Outfit',sans-serif; font-size:1.45rem; font-weight:800; letter-spacing:-.4px; color:var(--white); margin-bottom:.3rem; }
+.fms-form-sub   { font-size:.87rem; color:rgba(255,255,255,.42); font-weight:300; line-height:1.5; margin-bottom:1.25rem; }
+
+/* Section divider */
+.fms-sec { font-size:.67rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.25); margin:1.25rem 0 .75rem; display:flex; align-items:center; gap:10px; }
+.fms-sec::before, .fms-sec::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.07); }
+
+/* Field label */
+.fms-lbl { font-size:.68rem; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.35); display:block; margin-bottom:4px; }
+
+/* Input wrapper */
+.fms-iw { position:relative; display:flex; align-items:center; margin-bottom:.85rem; }
+.fms-ico { position:absolute; left:12px; font-size:.85rem; color:rgba(255,255,255,.25); pointer-events:none; z-index:1; }
+.fms-in, .fms-sel, .fms-ta {
+    width:100%; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);
+    border-radius:10px; padding:11px 13px 11px 36px;
+    font-family:'DM Sans',sans-serif; font-size:.9rem; color:var(--white);
+    outline:none; appearance:none; transition:border-color .2s,box-shadow .2s;
+}
+.fms-sel { cursor:pointer; }
+.fms-ta  { resize:vertical; min-height:88px; padding-top:11px; }
+.fms-in::placeholder, .fms-ta::placeholder { color:rgba(255,255,255,.17); }
+.fms-in:focus, .fms-sel:focus, .fms-ta:focus { border-color:var(--sky); box-shadow:0 0 0 3px rgba(14,165,233,.17); }
+select.fms-sel option { background:#0f2040; }
+
+/* Password eye */
+.fms-eye { position:absolute; right:12px; background:none; border:none; cursor:pointer; color:rgba(255,255,255,.25); font-size:.85rem; padding:0; line-height:1; transition:color .2s; }
+.fms-eye:hover { color:var(--sky); }
+
+/* Two-column grid */
+.fms-row { display:grid; grid-template-columns:1fr 1fr; gap:.85rem; }
+.fms-row .fms-full { grid-column:span 2; }
+
+/* Chips */
+.fms-chips { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:.85rem; }
+.fms-chip { padding:5px 12px; border-radius:40px; font-size:.72rem; font-weight:500; border:1px solid rgba(255,255,255,.11); background:rgba(255,255,255,.04); color:rgba(255,255,255,.40); cursor:pointer; transition:all .2s; user-select:none; }
+.fms-chip:hover   { border-color:rgba(14,165,233,.4); color:rgba(255,255,255,.75); }
+.fms-chip.on      { background:rgba(14,165,233,.15); border-color:rgba(14,165,233,.4); color:#7dd3fc; }
+.fms-chip-g:hover { border-color:rgba(16,185,129,.4); color:rgba(255,255,255,.75); }
+.fms-chip-g.on    { background:rgba(16,185,129,.15); border-color:rgba(16,185,129,.4); color:#6ee7b7; }
+
+/* Agreement */
+.fms-agree { display:flex; align-items:flex-start; gap:9px; font-size:.81rem; color:rgba(255,255,255,.36); line-height:1.55; cursor:pointer; margin-bottom:.5rem; }
+.fms-agree input[type=checkbox] { width:15px; height:15px; flex-shrink:0; margin-top:2px; accent-color:var(--sky); cursor:pointer; }
+.fms-agree a { color:var(--sky); text-decoration:none; }
+.fms-agree a:hover { text-decoration:underline; }
+
+/* Submit button */
+.fms-submit { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; padding:13px; border:none; border-radius:11px; font-family:'Outfit',sans-serif; font-size:.95rem; font-weight:700; cursor:pointer; margin-top:1.25rem; transition:transform .2s,box-shadow .2s,opacity .2s; }
+.fms-submit:hover  { transform:translateY(-2px); opacity:.92; }
+.fms-submit:active { transform:scale(.98); }
+.fms-submit i { transition:transform .2s; }
+.fms-submit:hover i { transform:translateX(3px); }
+.btn-sky   { background:linear-gradient(135deg,#0ea5e9,#06b6d4); color:#fff !important; box-shadow:0 8px 22px rgba(14,165,233,.32); }
+.btn-green { background:linear-gradient(135deg,#10b981,#059669); color:#fff !important; box-shadow:0 8px 22px rgba(16,185,129,.32); }
+
+/* Alert */
+.fms-err { padding:10px 14px; border-radius:10px; font-size:.84rem; margin-bottom:1rem; display:flex; align-items:flex-start; gap:8px; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.25); color:#fca5a5; }
+.fms-info { padding:10px 14px; border-radius:10px; font-size:.84rem; margin-bottom:1rem; display:flex; align-items:flex-start; gap:8px; background:rgba(14,165,233,.12); border:1px solid rgba(14,165,233,.25); color:#7dd3fc; }
+
+/* Footer */
+.fms-footer { text-align:center; margin-top:1rem; font-size:.81rem; color:rgba(255,255,255,.27); }
+.fms-footer a { color:var(--sky); text-decoration:none; font-weight:500; }
+.fms-footer a:hover { text-decoration:underline; }
+.fms-sep { margin:0 .4rem; opacity:.4; }
+
+@media (max-width:520px) {
+    .fms-form-card{padding:1.75rem 1rem;border-radius:16px;}
+    .fms-row{grid-template-columns:1fr;}
+    .fms-row .fms-full{grid-column:span 1;}
+}
+</style>
+</template>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     2. CUSTOMER SIGNUP FORM  —  /fms/signup/customer
+═══════════════════════════════════════════════════════════ -->
+<template id="fms_signup_customer" name="FMS Customer Signup">
+    <t t-call="web.layout">
+        <t t-set="head">
+            <title>Customer Sign Up — FacilityPro</title>
+            <link rel="stylesheet" href="/web/static/lib/fontawesome/css/font-awesome.css"/>
+            <t t-call="registration_process.fms_form_styles"/>
+        </t>
+
+        <div class="fms-bg"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+
+        <div class="fms-page">
+            <a href="/web/signup" class="fms-logo-bar">
+                <div class="fms-logo-icon"><i class="fa fa-building"></i></div>
+                <span class="fms-logo-name">Facility<span>Pro</span></span>
+            </a>
+
+            <div class="fms-form-card">
+                <span class="fms-role-badge badge-sky"><i class="fa fa-building-o"></i> Customer Registration</span>
+                <div class="fms-form-title">Create your account</div>
+                <div class="fms-form-sub">Get access to managed services, work order tracking and real-time facility reporting.</div>
+
+                <!-- Error / message -->
+                <t t-if="error">
+                    <div class="fms-err"><i class="fa fa-exclamation-circle" style="flex-shrink:0;margin-top:2px;"></i><span t-out="error"/></div>
+                </t>
+                <t t-if="message">
+                    <div class="fms-info"><i class="fa fa-info-circle" style="flex-shrink:0;margin-top:2px;"></i><span t-out="message"/></div>
+                </t>
+
+                <form action="/fms/signup/customer" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="role" value="customer"/>
+
+                    <div class="fms-sec">Account Credentials</div>
+                    <label class="fms-lbl">Full Name *</label>
+                    <div class="fms-iw">
+                        <i class="fa fa-user fms-ico"></i>
+                        <input name="name" type="text" class="fms-in" placeholder="John Smith" required="required" t-att-value="name or ''"/>
+                    </div>
+                    <label class="fms-lbl">Work Email *</label>
+                    <div class="fms-iw">
+                        <i class="fa fa-envelope fms-ico"></i>
+                        <input name="login" type="email" class="fms-in" placeholder="you@company.com" required="required" autocomplete="username" t-att-value="login or ''"/>
+                    </div>
+                    <div class="fms-row">
+                        <div>
+                            <label class="fms-lbl">Password *</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-lock fms-ico"></i>
+                                <input name="password" id="cpw1" type="password" class="fms-in" placeholder="Min. 8 characters" required="required" autocomplete="new-password"/>
+                                <button type="button" class="fms-eye" onclick="fEye('cpw1',this)"><i class="fa fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="fms-lbl">Confirm Password *</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-lock fms-ico"></i>
+                                <input name="confirm_password" id="cpw2" type="password" class="fms-in" placeholder="Repeat password" required="required" autocomplete="new-password"/>
+                                <button type="button" class="fms-eye" onclick="fEye('cpw2',this)"><i class="fa fa-eye"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fms-sec">Organisation Details</div>
+                    <label class="fms-lbl">Company / Organisation Name *</label>
+                    <div class="fms-iw">
+                        <i class="fa fa-building fms-ico"></i>
+                        <input name="fms_company" type="text" class="fms-in" placeholder="Acme Corp Ltd." required="required"/>
+                    </div>
+                    <div class="fms-row">
+                        <div>
+                            <label class="fms-lbl">Phone Number</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-phone fms-ico"></i>
+                                <input name="fms_phone" type="tel" class="fms-in" placeholder="+1 555 000 0000"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="fms-lbl">Facility Type</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-industry fms-ico"></i>
+                                <select name="fms_facility_type" class="fms-sel">
+                                    <option value="">Select…</option>
+                                    <option value="commercial">Commercial Office</option>
+                                    <option value="retail">Retail &amp; Shopping</option>
+                                    <option value="industrial">Industrial / Warehouse</option>
+                                    <option value="healthcare">Healthcare</option>
+                                    <option value="education">Education Campus</option>
+                                    <option value="hospitality">Hospitality &amp; Hotel</option>
+                                    <option value="residential">Residential Complex</option>
+                                    <option value="government">Government / Public</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="fms-lbl">Number of Sites</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-map-marker fms-ico"></i>
+                                <select name="fms_num_sites" class="fms-sel">
+                                    <option value="">Select…</option>
+                                    <option value="1">1 site</option>
+                                    <option value="2-5">2–5 sites</option>
+                                    <option value="6-20">6–20 sites</option>
+                                    <option value="20+">20+ sites</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fms-sec">Services Required</div>
+                    <input type="hidden" name="fms_services_needed" id="csvc"/>
+                    <div class="fms-chips" id="csvc_chips">
+                        <span class="fms-chip" data-v="HVAC"          onclick="fChip(this,'csvc_chips','csvc')">🔧 HVAC</span>
+                        <span class="fms-chip" data-v="Electrical"    onclick="fChip(this,'csvc_chips','csvc')">💡 Electrical</span>
+                        <span class="fms-chip" data-v="Plumbing"      onclick="fChip(this,'csvc_chips','csvc')">🚿 Plumbing</span>
+                        <span class="fms-chip" data-v="Cleaning"      onclick="fChip(this,'csvc_chips','csvc')">🧹 Cleaning</span>
+                        <span class="fms-chip" data-v="Security"      onclick="fChip(this,'csvc_chips','csvc')">🔒 Security</span>
+                        <span class="fms-chip" data-v="Landscaping"   onclick="fChip(this,'csvc_chips','csvc')">🌿 Landscaping</span>
+                        <span class="fms-chip" data-v="Fire Safety"   onclick="fChip(this,'csvc_chips','csvc')">🔥 Fire Safety</span>
+                        <span class="fms-chip" data-v="Waste Mgmt"    onclick="fChip(this,'csvc_chips','csvc')">♻️ Waste Mgmt</span>
+                    </div>
+
+                    <div class="fms-sec">Agreement</div>
+                    <label class="fms-agree">
+                        <input type="checkbox" required="required"/>
+                        I agree to the <a href="/terms" target="_blank">Terms of Service</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.
+                    </label>
+
+                    <button type="submit" class="fms-submit btn-sky">
+                        Create Customer Account <i class="fa fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="fms-footer">
+                    Already registered? <a href="/web/login">Sign in</a>
+                    <span class="fms-sep">|</span>
+                    <a href="/web/signup">← Choose different role</a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function fEye(id,btn){var i=document.getElementById(id),ic=btn.querySelector('i');if(i.type==='password'){i.type='text';ic.className='fa fa-eye-slash';}else{i.type='password';ic.className='fa fa-eye';}}
+            function fChip(el,grp,hid){el.classList.toggle('on');var v=[];document.querySelectorAll('#'+grp+' .fms-chip.on').forEach(function(c){v.push(c.dataset.v);});document.getElementById(hid).value=v.join(', ');}
+        </script>
+    </t>
+</template>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     3. VENDOR SIGNUP FORM  —  /fms/signup/vendor
+═══════════════════════════════════════════════════════════ -->
+<template id="fms_signup_vendor" name="FMS Vendor Signup">
+    <t t-call="web.layout">
+        <t t-set="head">
+            <title>Vendor Sign Up — FacilityPro</title>
+            <link rel="stylesheet" href="/web/static/lib/fontawesome/css/font-awesome.css"/>
+            <t t-call="registration_process.fms_form_styles"/>
+        </t>
+
+        <div class="fms-bg"></div>
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+
+        <div class="fms-page">
+            <a href="/web/signup" class="fms-logo-bar">
+                <div class="fms-logo-icon"><i class="fa fa-building"></i></div>
+                <span class="fms-logo-name">Facility<span>Pro</span></span>
+            </a>
+
+            <div class="fms-form-card">
+                <span class="fms-role-badge badge-green"><i class="fa fa-users"></i> Vendor Registration</span>
+                <div class="fms-form-title">Join our vendor network</div>
+                <div class="fms-form-sub">Submit your profile to receive service requests, manage jobs and grow your facility management business.</div>
+
+                <t t-if="error">
+                    <div class="fms-err"><i class="fa fa-exclamation-circle" style="flex-shrink:0;margin-top:2px;"></i><span t-out="error"/></div>
+                </t>
+                <t t-if="message">
+                    <div class="fms-info"><i class="fa fa-info-circle" style="flex-shrink:0;margin-top:2px;"></i><span t-out="message"/></div>
+                </t>
+
+                <form action="/fms/signup/vendor" method="post">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="role" value="vendor"/>
+
+                    <div class="fms-sec">Account Credentials</div>
+                    <label class="fms-lbl">Contact Person Full Name *</label>
+                    <div class="fms-iw">
+                        <i class="fa fa-user fms-ico"></i>
+                        <input name="name" type="text" class="fms-in" placeholder="Jane Doe" required="required" t-att-value="name or ''"/>
+                    </div>
+                    <label class="fms-lbl">Business Email *</label>
+                    <div class="fms-iw">
+                        <i class="fa fa-envelope fms-ico"></i>
+                        <input name="login" type="email" class="fms-in" placeholder="info@yourcompany.com" required="required" autocomplete="username" t-att-value="login or ''"/>
+                    </div>
+                    <div class="fms-row">
+                        <div>
+                            <label class="fms-lbl">Password *</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-lock fms-ico"></i>
+                                <input name="password" id="vpw1" type="password" class="fms-in" placeholder="Min. 8 characters" required="required" autocomplete="new-password"/>
+                                <button type="button" class="fms-eye" onclick="fEye('vpw1',this)"><i class="fa fa-eye"></i></button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="fms-lbl">Confirm Password *</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-lock fms-ico"></i>
+                                <input name="confirm_password" id="vpw2" type="password" class="fms-in" placeholder="Repeat password" required="required" autocomplete="new-password"/>
+                                <button type="button" class="fms-eye" onclick="fEye('vpw2',this)"><i class="fa fa-eye"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fms-sec">Company Information</div>
+                    <label class="fms-lbl">Company / Business Name *</label>
+                    <div class="fms-iw">
+                        <i class="fa fa-industry fms-ico"></i>
+                        <input name="fms_company" type="text" class="fms-in" placeholder="ProMaintain Services Inc." required="required"/>
+                    </div>
+                    <div class="fms-row">
+                        <div>
+                            <label class="fms-lbl">Phone / WhatsApp</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-phone fms-ico"></i>
+                                <input name="fms_phone" type="tel" class="fms-in" placeholder="+1 555 000 0000"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="fms-lbl">Business Reg. No.</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-file-text fms-ico"></i>
+                                <input name="fms_registration_no" type="text" class="fms-in" placeholder="e.g. RC-123456"/>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="fms-lbl">Primary Service Category *</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-wrench fms-ico"></i>
+                                <select name="fms_service_category" class="fms-sel" required="required">
+                                    <option value="">Select service…</option>
+                                    <option value="hvac">HVAC &amp; Mechanical</option>
+                                    <option value="electrical">Electrical Systems</option>
+                                    <option value="plumbing">Plumbing &amp; Sanitation</option>
+                                    <option value="cleaning">Cleaning &amp; Janitorial</option>
+                                    <option value="security">Security &amp; Access Control</option>
+                                    <option value="landscaping">Landscaping &amp; Grounds</option>
+                                    <option value="fire">Fire Safety &amp; Suppression</option>
+                                    <option value="waste">Waste Management</option>
+                                    <option value="elevators">Elevators &amp; Lifts</option>
+                                    <option value="civil">General Civil Works</option>
+                                    <option value="multi">Multiple / General FM</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="fms-lbl">Coverage Region</label>
+                            <div class="fms-iw">
+                                <i class="fa fa-map fms-ico"></i>
+                                <select name="fms_coverage_region" class="fms-sel">
+                                    <option value="">Select…</option>
+                                    <option value="north">North</option>
+                                    <option value="south">South</option>
+                                    <option value="east">East</option>
+                                    <option value="west">West</option>
+                                    <option value="national">Nationwide</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <label class="fms-lbl">Company Profile / Description</label>
+                    <div class="fms-iw" style="align-items:flex-start;">
+                        <i class="fa fa-align-left fms-ico" style="top:12px;position:absolute;"></i>
+                        <textarea name="fms_company_profile" class="fms-ta" placeholder="Describe your company, years in operation, key capabilities…"></textarea>
+                    </div>
+
+                    <div class="fms-sec">Certifications &amp; Specializations</div>
+                    <input type="hidden" name="fms_certifications" id="vcerts"/>
+                    <div class="fms-chips" id="vcert_chips">
+                        <span class="fms-chip fms-chip-g" data-v="ISO 45001" onclick="fChip(this,'vcert_chips','vcerts')">ISO 45001</span>
+                        <span class="fms-chip fms-chip-g" data-v="LEED"      onclick="fChip(this,'vcert_chips','vcerts')">LEED</span>
+                        <span class="fms-chip fms-chip-g" data-v="ASHRAE"    onclick="fChip(this,'vcert_chips','vcerts')">ASHRAE</span>
+                        <span class="fms-chip fms-chip-g" data-v="OSHA 30"   onclick="fChip(this,'vcert_chips','vcerts')">OSHA 30</span>
+                        <span class="fms-chip fms-chip-g" data-v="NFPA 72"   onclick="fChip(this,'vcert_chips','vcerts')">NFPA 72</span>
+                        <span class="fms-chip fms-chip-g" data-v="BMS/BAS"   onclick="fChip(this,'vcert_chips','vcerts')">BMS/BAS</span>
+                        <span class="fms-chip fms-chip-g" data-v="Cleanroom" onclick="fChip(this,'vcert_chips','vcerts')">Cleanroom</span>
+                        <span class="fms-chip fms-chip-g" data-v="HVAC-R"    onclick="fChip(this,'vcert_chips','vcerts')">HVAC-R</span>
+                    </div>
+
+                    <div class="fms-sec">Agreement</div>
+                    <label class="fms-agree">
+                        <input type="checkbox" required="required"/>
+                        I agree to the <a href="/vendor-terms" target="_blank">Vendor Terms &amp; Conditions</a> and <a href="/privacy" target="_blank">Privacy Policy</a>.
+                        I understand my profile will be reviewed before full activation.
+                    </label>
+
+                    <button type="submit" class="fms-submit btn-green">
+                        Submit Vendor Application <i class="fa fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="fms-footer">
+                    Already registered? <a href="/web/login">Sign in</a>
+                    <span class="fms-sep">|</span>
+                    <a href="/web/signup">← Choose different role</a>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function fEye(id,btn){var i=document.getElementById(id),ic=btn.querySelector('i');if(i.type==='password'){i.type='text';ic.className='fa fa-eye-slash';}else{i.type='password';ic.className='fa fa-eye';}}
+            function fChip(el,grp,hid){el.classList.toggle('on');var v=[];document.querySelectorAll('#'+grp+' .fms-chip.on').forEach(function(c){v.push(c.dataset.v);});document.getElementById(hid).value=v.join(', ');}
+        </script>
+    </t>
+</template>
+
+</data>
+</odoo>
