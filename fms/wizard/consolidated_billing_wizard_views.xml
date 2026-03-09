@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_fms_consolidated_billing_wizard_form" model="ir.ui.view">
+        <field name="name">fms.consolidated.billing.wizard.form</field>
+        <field name="model">fms.consolidated.billing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Billing Run">
+                <group string="Billing Period">
+                    <field name="billing_frequency"/>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                </group>
+                <group string="Filters (Optional)">
+                    <field name="partner_ids" widget="many2many_tags"
+                           placeholder="All customers if empty"/>
+                    <field name="site_id"/>
+                </group>
+                <group string="Options">
+                    <field name="auto_confirm"/>
+                    <field name="auto_invoice"/>
+                </group>
+                <footer>
+                    <button name="action_run_billing"
+                            string="Run Billing"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_fms_consolidated_billing_wizard"
+            model="ir.actions.act_window">
+        <field name="name">Billing Run</field>
+        <field name="res_model">fms.consolidated.billing.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

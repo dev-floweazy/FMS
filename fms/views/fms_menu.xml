@@ -35,18 +35,11 @@
               action="action_fms_job"
               sequence="20"/>
 
-    <!-- ✅ NEW — Scope Approvals under Operations -->
     <menuitem id="menu_fms_scope_approvals"
               name="Scope Approvals"
               parent="menu_fms_operations"
               action="action_fms_scope_approval"
               sequence="30"/>
-
-<!--    <menuitem id="menu_fms_job_calendar"-->
-<!--              name="Job Calendar"-->
-<!--              parent="menu_fms_operations"-->
-<!--              action="action_fms_job_calendar"-->
-<!--              sequence="30"/>-->
 
     <!-- Vendors -->
     <menuitem id="menu_fms_vendor"
@@ -68,33 +61,11 @@
               action="action_fms_site"
               sequence="20"/>
 
-    <!-- ✅ NEW — Scope Approval Rules under Configuration -->
     <menuitem id="menu_fms_approval_rules"
               name="Scope Approval Rules"
               parent="menu_fms_configuration"
               action="action_fms_approval_rule"
               sequence="30"/>
-
-<!--    <menuitem id="menu_fms_rate_card"-->
-<!--              name="Rate Cards"-->
-<!--              parent="menu_fms_customers"-->
-<!--              action="action_fms_rate_card"-->
-<!--              sequence="30"/>-->
-
-<!--    <menuitem id="menu_fms_vendors"-->
-<!--              name="Vendors"-->
-<!--              parent="menu_fms_root"-->
-<!--              sequence="30"/>-->
-<!--    <menuitem id="menu_fms_vendor_list"-->
-<!--              name="Vendors"-->
-<!--              parent="menu_fms_vendors"-->
-<!--              action="action_fms_vendor"-->
-<!--              sequence="10"/>-->
-<!--    <menuitem id="menu_fms_vendor_performance"-->
-<!--              name="Performance"-->
-<!--              parent="menu_fms_vendors"-->
-<!--              action="action_fms_vendor_performance"-->
-<!--              sequence="20"/>-->
 
     <!-- Billing Menu -->
     <menuitem id="menu_fms_billing"
@@ -102,42 +73,28 @@
               parent="menu_fms_root"
               sequence="40"/>
 
-<!--    <menuitem id="menu_fms_sales_orders"-->
-<!--              name="Sales Orders"-->
-<!--              parent="menu_fms_billing"-->
-<!--              action="sale.action_orders"-->
-<!--              sequence="10"/>-->
-<!--    <menuitem id="menu_fms_invoices"-->
-<!--              name="Customer Invoices"-->
-<!--              parent="menu_fms_billing"-->
-<!--              action="account.action_move_out_invoice_type"-->
-<!--              sequence="20"/>-->
-<!--    <menuitem id="menu_fms_vendor_bills"-->
-<!--              name="Vendor Bills"-->
-<!--              parent="menu_fms_billing"-->
-<!--              action="account.action_move_in_invoice_type"-->
-<!--              sequence="30"/>-->
-<!--    <menuitem id="menu_fms_consolidated_billing"-->
-<!--              name="Consolidated Billing"-->
-<!--              parent="menu_fms_billing"-->
-<!--              action="action_fms_consolidated_invoice"-->
-<!--              sequence="40"/>-->
+    <menuitem id="menu_fms_billing_run"
+              name="Billing Run"
+              parent="menu_fms_billing"
+              action="action_fms_consolidated_billing_wizard"
+              sequence="10"/>
+
+    <menuitem id="menu_fms_consolidated_billing"
+              name="Consolidated Invoices"
+              parent="menu_fms_billing"
+              action="action_fms_consolidated_invoice"
+              sequence="20"/>
+
+    <menuitem id="menu_fms_invoices"
+              name="Customer Invoices"
+              parent="menu_fms_billing"
+              action="account.action_move_out_invoice_type"
+              sequence="30"/>
 
     <!-- Reports Menu -->
     <menuitem id="menu_fms_reports"
               name="Reports"
               parent="menu_fms_root"
               sequence="50"/>
-
-<!--    <menuitem id="menu_fms_margin_report"-->
-<!--              name="Margin Analysis"-->
-<!--              parent="menu_fms_reports"-->
-<!--              action="action_fms_margin_report"-->
-<!--              sequence="10"/>-->
-<!--    <menuitem id="menu_fms_sla_report"-->
-<!--              name="SLA Compliance"-->
-<!--              parent="menu_fms_reports"-->
-<!--              action="action_fms_sla_report"-->
-<!--              sequence="20"/>-->
 
 </odoo>

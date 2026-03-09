@@ -36,9 +36,41 @@
         <field name="model">fms.job</field>
         <field name="arch" type="xml">
             <form string="Job">
+                <header>
+                    <button name="action_assign"
+                            string="Assign"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state != 'draft'"/>
+                    <button name="action_schedule"
+                            string="Schedule"
+                            type="object"
+                            class="btn-secondary"
+                            invisible="state not in ('draft', 'assigned')"/>
+                    <button name="action_start"
+                            string="Start"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state not in ('assigned', 'scheduled')"/>
+                    <button name="action_complete"
+                            string="Mark as Completed"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state not in ('draft', 'assigned', 'scheduled', 'in_progress')"/>
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            class="btn-danger"
+                            invisible="state in ('invoiced', 'cancelled')"/>
+                    <button name="action_reset_draft"
+                            string="Reset to Draft"
+                            type="object"
+                            invisible="state not in ('cancelled', 'assigned', 'scheduled')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,assigned,in_progress,completed,invoiced"/>
+                </header>
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-
                         <button name="action_view_sale_orders"
                                 type="object"
                                 class="oe_stat_button"
@@ -47,7 +79,6 @@
                                    widget="statinfo"
                                    string="Sales Orders"/>
                         </button>
-
                         <button name="action_view_purchase_orders"
                                 type="object"
                                 class="oe_stat_button"
@@ -56,7 +87,6 @@
                                    widget="statinfo"
                                    string="Vendor POs"/>
                         </button>
-
                         <button name="action_view_invoice"
                                 type="object"
                                 class="oe_stat_button"
@@ -65,8 +95,6 @@
                                    widget="statinfo"
                                    string="Invoice"/>
                         </button>
-
-                        <!-- Approvals button — visible only when requests exist -->
                         <button name="action_view_scope_approvals"
                                 type="object"
                                 class="oe_stat_button"
@@ -76,9 +104,7 @@
                                    widget="statinfo"
                                    string="Approvals"/>
                         </button>
-
                     </div>
-
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>
                         <h1>
@@ -89,7 +115,6 @@
                                    placeholder="Job Number"/>
                         </h1>
                     </div>
-
                     <group>
                         <group>
                             <field name="ticket_id"/>
@@ -105,7 +130,6 @@
                             <field name="end_date"/>
                         </group>
                     </group>
-
                     <group string="SLA Information">
                         <group>
                             <field name="sla_rule_id" readonly="1"/>
@@ -117,7 +141,6 @@
                             <field name="sla_breached" readonly="1"/>
                         </group>
                     </group>
-
                     <notebook>
                         <page string="Job Details" name="job_lines">
                             <field name="job_line_ids">
@@ -165,7 +188,6 @@
                                 <field name="currency_id" invisible="1"/>
                             </group>
                         </page>
-
                         <page string="Work Completion" name="completion">
                             <group>
                                 <field name="work_summary"
@@ -178,7 +200,6 @@
                                 <field name="customer_feedback"/>
                             </group>
                         </page>
-
                         <page string="Notes">
                             <field name="notes"
                                    placeholder="Additional notes..."/>
@@ -198,5 +219,4 @@
             <p class="o_view_nocontent_smiling_face">Add your first job</p>
         </field>
     </record>
-
 </odoo>

@@ -3,6 +3,8 @@ fms.access_fms_rate_card,access_fms_rate_card,fms.model_fms_rate_card,base.group
 fms.access_fms_margin_report,access_fms_margin_report,fms.model_fms_margin_report,base.group_user,1,1,1,1
 fms.access_fms_service_category,access_fms_service_category,fms.model_fms_service_category,base.group_user,1,1,1,1
 fms.access_fms_consolidated_invoice,access_fms_consolidated_invoice,fms.model_fms_consolidated_invoice,base.group_user,1,1,1,1
+fms.access_fms_consolidated_invoice_line,access_fms_consolidated_invoice_line,fms.model_fms_consolidated_invoice_line,base.group_user,1,1,1,1
+fms.access_fms_consolidated_billing_wizard,access_fms_consolidated_billing_wizard,fms.model_fms_consolidated_billing_wizard,base.group_user,1,1,1,1
 fms.access_fms_ticket,access_fms_ticket,fms.model_fms_ticket,base.group_user,1,1,1,1
 fms.access_fms_job,access_fms_job,fms.model_fms_job,base.group_user,1,1,1,1
 fms.access_fms_job_line,access_fms_job_line,fms.model_fms_job_line,base.group_user,1,1,1,1
