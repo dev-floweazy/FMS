@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from odoo import fields, models
 
 
@@ -12,6 +11,7 @@ class FMSSLARule(models.Model):
 
     service_category_id = fields.Many2one(
         'fms.service.category',
+        string='Service Category',
         required=True
     )
 
@@ -33,7 +33,3 @@ class FMSSLARule(models.Model):
     )
 
     active = fields.Boolean(default=True)
-    resolution_time = fields.Float(string='Resolution Time (Hours)')
-
-    apply_to_all = fields.Boolean()
-    partner_ids = fields.Many2many('res.partner')

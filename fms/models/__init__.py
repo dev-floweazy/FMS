@@ -12,3 +12,4 @@ from . import fms_consolidated_invoice
 from . import fms_ticket_sla
 from . import product_product
 from .import fms_scope_approval
+from .import sale_order
