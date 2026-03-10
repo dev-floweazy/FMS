@@ -54,7 +54,7 @@
                                     <field name="list_price"/>
                                 </list>
                             </field>
-                        </page>attr
+                        </page>
                         <page string="Sub-Categories" invisible="not child_ids">
                             <field name="child_ids">
                                 <list>

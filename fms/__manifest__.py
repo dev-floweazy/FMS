@@ -74,7 +74,7 @@ Multi-Tenant Ready:
         'data/job_name.xml',
         'views/fms_service_category_views.xml',
         'views/fms_site_views.xml',
-        # 'views/fms_rate_card_views.xml',
+        'views/fms_rate_card_views.xml',
         'views/fms_ticket_views.xml',
         'views/fms_job_views.xml',
         'views/res_partner_views.xml',
@@ -84,6 +84,7 @@ Multi-Tenant Ready:
         'views/fms_consolidated_invoice_views.xml',
         'wizard/consolidated_billing_wizard_views.xml',
         'views/sale_order_views.xml',
+        'views/fms_sla_report_views.xml',
         'views/fms_menu.xml',
 
     ],
