@@ -14,3 +14,4 @@ fms.access_fms_approval_rule,access_fms_approval_rule,fms.model_fms_approval_rul
 fms.access_fms_scope_approval,access_fms_scope_approval,fms.model_fms_scope_approval,base.group_user,1,1,1,1
 fms.access_fms_scope_approval_line,access_fms_scope_approval_line,fms.model_fms_scope_approval_line,base.group_user,1,1,1,1
 fms.access_fms_scope_rejection_wizard,access_fms_scope_rejection_wizard,fms.model_fms_scope_rejection_wizard,base.group_user,1,1,1,1
+fms.access_fms_sla_report,access_fms_sla_report,fms.model_fms_sla_report,base.group_user,1,0,0,0

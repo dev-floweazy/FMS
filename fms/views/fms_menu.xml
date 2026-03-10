@@ -101,5 +101,10 @@
               name="Reports"
               parent="menu_fms_root"
               sequence="50"/>
+    <menuitem id="menu_fms_sla_report"
+              name="SLA Report"
+              parent="menu_fms_reports"
+              action="action_fms_sla_report"
+              sequence="10"/>
 
 </odoo>

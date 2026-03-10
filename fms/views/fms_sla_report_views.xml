@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form View -->
+    <record id="view_fms_sla_report_form" model="ir.ui.view">
+        <field name="name">fms.sla.report.form</field>
+        <field name="model">fms.sla.report</field>
+        <field name="arch" type="xml">
+            <form string="SLA Report" create="false" edit="false" delete="false">
+                <sheet>
+                    <group string="Ticket Information">
+                        <group>
+                            <field name="ticket_name" string="Ticket"/>
+                            <field name="partner_id"/>
+                            <field name="site_id"/>
+                            <field name="service_category_id"/>
+                            <field name="priority"/>
+                            <field name="state"/>
+                            <field name="assigned_to_id"/>
+                            <field name="requested_date"/>
+                        </group>
+                        <group string="SLA Information">
+                            <field name="sla_rule_id"/>
+                            <field name="sla_start_datetime"/>
+                            <field name="sla_response_deadline"/>
+                            <field name="sla_resolution_deadline"/>
+                            <field name="response_time_hours" string="Response Time (hrs)"/>
+                            <field name="resolution_time_hours" string="Resolution Time (hrs)"/>
+                            <field name="sla_breached" widget="boolean"/>
+                        </group>
+                    </group>
+                    <group string="Financial Summary">
+                        <group>
+<!--                            <field name="currency_id" invisible="1"/>-->
+                            <field name="total_cost" widget="monetary"/>
+                            <field name="total_price" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="fms_margin" widget="monetary"
+                                   decoration-danger="fms_margin &lt; 0"
+                                   decoration-success="fms_margin &gt; 0"/>
+                            <field name="margin_percent" widget="percentage"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_fms_sla_report_list" model="ir.ui.view">
+        <field name="name">fms.sla.report.list</field>
+        <field name="model">fms.sla.report</field>
+        <field name="arch" type="xml">
+            <list string="SLA Report"
+                  create="false"
+                  edit="false"
+                  delete="false"
+                  decoration-danger="sla_breached == True"
+                  decoration-success="sla_breached == False and state in ('resolved','closed')"
+                  decoration-warning="sla_breached == False and state not in ('resolved','closed','cancelled')">
+<!--                <field name="currency_id" invisible="1"/>-->
+<!--                <field name="ticket_id" invisible="1"/>-->
+                <field name="ticket_name" string="Ticket"/>
+                <field name="partner_id"/>
+                <field name="site_id"/>
+                <field name="service_category_id"/>
+                <field name="priority"/>
+                <field name="state"/>
+                <field name="assigned_to_id"/>
+                <field name="sla_rule_id"/>
+                <field name="sla_start_datetime"/>
+                <field name="sla_response_deadline"/>
+                <field name="sla_resolution_deadline"/>
+                <field name="response_time_hours" string="Response (hrs)"/>
+                <field name="resolution_time_hours" string="Resolution (hrs)"/>
+                <field name="sla_breached" widget="boolean"/>
+                <field name="total_cost" widget="monetary"
+                       sum="Total Cost"/>
+                <field name="total_price" widget="monetary"
+                       sum="Total Price"/>
+                <field name="fms_margin" widget="monetary"
+                       sum="Total Margin"
+                       decoration-danger="fms_margin &lt; 0"
+                       decoration-success="fms_margin &gt; 0"/>
+                <field name="margin_percent" widget="percentage"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_fms_sla_report_pivot" model="ir.ui.view">
+        <field name="name">fms.sla.report.pivot</field>
+        <field name="model">fms.sla.report</field>
+        <field name="arch" type="xml">
+            <pivot string="SLA &amp; Margin Analysis">
+                <field name="service_category_id" type="row"/>
+                <field name="priority" type="col"/>
+                <field name="fms_margin" type="measure"/>
+                <field name="total_cost" type="measure"/>
+                <field name="total_price" type="measure"/>
+                <field name="resolution_time_hours" type="measure"/>
+                <field name="response_time_hours" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- Graph View -->
+    <record id="view_fms_sla_report_graph" model="ir.ui.view">
+        <field name="name">fms.sla.report.graph</field>
+        <field name="model">fms.sla.report</field>
+        <field name="arch" type="xml">
+            <graph string="SLA &amp; Margin Analysis" type="bar">
+                <field name="service_category_id" type="row"/>
+                <field name="fms_margin" type="measure"/>
+                <field name="total_price" type="measure"/>
+                <field name="total_cost" type="measure"/>
+                <field name="resolution_time_hours" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_fms_sla_report_search" model="ir.ui.view">
+        <field name="name">fms.sla.report.search</field>
+        <field name="model">fms.sla.report</field>
+        <field name="arch" type="xml">
+            <search string="SLA Report">
+                <field name="ticket_name" string="Ticket"/>
+                <field name="partner_id"/>
+                <field name="site_id"/>
+                <field name="service_category_id"/>
+                <field name="assigned_to_id"/>
+                <field name="sla_rule_id"/>
+                <filter string="Breached" name="breached"
+                        domain="[('sla_breached', '=', True)]"/>
+                <filter string="Compliant" name="compliant"
+                        domain="[('sla_breached', '=', False)]"/>
+                <separator/>
+                <filter string="Open" name="open"
+                        domain="[('state', 'not in', ['resolved','closed','cancelled'])]"/>
+                <filter string="Resolved / Closed" name="resolved"
+                        domain="[('state', 'in', ['resolved','closed'])]"/>
+                <separator/>
+                <filter string="High / Urgent" name="high_priority"
+                        domain="[('priority', 'in', ['2','3'])]"/>
+                <separator/>
+                <filter string="Customer" name="group_customer"
+                        context="{'group_by': 'partner_id'}"/>
+                <filter string="Site" name="group_site"
+                        context="{'group_by': 'site_id'}"/>
+                <filter string="Service Category" name="group_category"
+                        context="{'group_by': 'service_category_id'}"/>
+                <filter string="Priority" name="group_priority"
+                        context="{'group_by': 'priority'}"/>
+                <filter string="Status" name="group_state"
+                        context="{'group_by': 'state'}"/>
+                <filter string="SLA Rule" name="group_sla_rule"
+                        context="{'group_by': 'sla_rule_id'}"/>
+                <filter string="Assigned To" name="group_assigned"
+                        context="{'group_by': 'assigned_to_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_fms_sla_report" model="ir.actions.act_window">
+        <field name="name">SLA Report</field>
+        <field name="res_model">fms.sla.report</field>
+        <field name="view_mode">list,form,pivot,graph</field>
+        <field name="context">{'search_default_open': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No SLA data found.
+            </p>
+            <p>
+                SLA reports appear here once tickets with SLA rules are created.
+            </p>
+        </field>
+    </record>
+
+</odoo>
