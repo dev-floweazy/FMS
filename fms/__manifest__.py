@@ -83,6 +83,7 @@ Multi-Tenant Ready:
         'views/fms_scope_approval_views.xml',
         'views/fms_consolidated_invoice_views.xml',
         'wizard/consolidated_billing_wizard_views.xml',
+        'views/sale_order_views.xml',
         'views/fms_menu.xml',
 
     ],

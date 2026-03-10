@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_sale_order_tree_fms_margin" model="ir.ui.view">
+        <field name="name">sale.order.tree.fms.margin</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
+        <field name="arch" type="xml">
+            <field name="amount_total" position="after">
+                <field name="fms_margin" string="FMS Margin" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Kanban View -->
+    <record id="view_sale_order_kanban_fms_margin" model="ir.ui.view">
+        <field name="name">sale.order.kanban.fms.margin</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="arch" type="xml">
+            <field name="amount_total" position="after">
+                <field name="fms_margin" string="FMS Margin"/>
+            </field>
+        </field>
+    </record>
+
+    <!-- Pivot View -->
+    <record id="view_sale_order_pivot_fms_margin" model="ir.ui.view">
+        <field name="name">sale.order.pivot.fms.margin</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_pivot"/>
+        <field name="arch" type="xml">
+            <xpath expr="//pivot" position="inside">
+                <field name="fms_margin" type="measure" string="FMS Margin"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Search View — Group By -->
+
+    <record id="view_sale_order_search_fms_margin" model="ir.ui.view">
+        <field name="name">sale.order.search.fms.margin</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <group>
+                    <filter
+                        string="FMS Margin"
+                        name="group_by_fms_margin"
+                        context="{'group_by': 'fms_margin'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

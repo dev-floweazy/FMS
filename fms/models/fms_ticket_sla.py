@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
-
 from odoo import api, fields, models
 from datetime import timedelta
 
 
-class FMSTicket(models.Model):
+class FMSTicketSLA(models.Model):
     _inherit = 'fms.ticket'
-
-    # ---------------------------
-    # SLA fields
-    # ---------------------------
 
     sla_rule_id = fields.Many2one(
         'fms.sla.rule',
@@ -34,13 +29,12 @@ class FMSTicket(models.Model):
 
     sla_breached = fields.Boolean(
         compute='_compute_sla_breached',
-        store=False
+        store=True
     )
 
-    # ------------------------------------
-    # SLA RULE SELECTION
-    # ------------------------------------
-
+    # --------------------------------------------------
+    # SLA RULE: match by service category + priority
+    # --------------------------------------------------
     @api.depends('service_category_id', 'priority')
     def _compute_sla_rule(self):
         for rec in self:
@@ -50,30 +44,36 @@ class FMSTicket(models.Model):
                 ('active', '=', True)
             ], limit=1)
 
-    # ------------------------------------
-    # SLA start at creation
-    # ------------------------------------
-
+    # --------------------------------------------------
+    # SET SLA START on ticket creation
+    # --------------------------------------------------
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
-
         now = fields.Datetime.now()
         for rec in records:
-            if rec.sla_rule_id:
+            if rec.sla_rule_id and not rec.sla_start_datetime:
                 rec.sla_start_datetime = now
-
         return records
 
-    # ------------------------------------
-    # SLA deadlines
-    # ------------------------------------
+    # --------------------------------------------------
+    # Also start SLA if rule is assigned later
+    # --------------------------------------------------
+    def write(self, vals):
+        result = super().write(vals)
+        if 'service_category_id' in vals or 'priority' in vals:
+            now = fields.Datetime.now()
+            for rec in self:
+                if rec.sla_rule_id and not rec.sla_start_datetime:
+                    rec.sla_start_datetime = now
+        return result
 
+    # --------------------------------------------------
+    # COMPUTE DEADLINES
+    # --------------------------------------------------
     @api.depends('sla_start_datetime', 'sla_rule_id')
     def _compute_sla_deadlines(self):
-
         for rec in self:
-
             rec.sla_response_deadline = False
             rec.sla_resolution_deadline = False
 
@@ -83,22 +83,20 @@ class FMSTicket(models.Model):
             rec.sla_response_deadline = rec.sla_start_datetime + timedelta(
                 hours=rec.sla_rule_id.response_time
             )
-
             rec.sla_resolution_deadline = rec.sla_start_datetime + timedelta(
                 hours=rec.sla_rule_id.resolution_time
             )
+            # Keep the legacy sla_deadline field in sync
+            rec.sla_deadline = rec.sla_resolution_deadline
 
-    # ------------------------------------
-    # SLA breach
-    # ------------------------------------
-
+    # --------------------------------------------------
+    # COMPUTE BREACH FLAG
+    # --------------------------------------------------
     @api.depends('sla_resolution_deadline')
     def _compute_sla_breached(self):
-
         now = fields.Datetime.now()
-
         for rec in self:
-            rec.sla_breached = False
-
-            if rec.sla_resolution_deadline and now > rec.sla_resolution_deadline:
-                rec.sla_breached = True
+            rec.sla_breached = bool(
+                rec.sla_resolution_deadline
+                and now > rec.sla_resolution_deadline
+            )

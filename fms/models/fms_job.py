@@ -171,7 +171,7 @@ class FMSJob(models.Model):
         records = super().create(vals_list)
         now = fields.Datetime.now()
         for job in records:
-            if job.sla_rule_id:
+            if job.sla_rule_id and not job.sla_start_datetime:
                 job.sla_start_datetime = now
         return records
 

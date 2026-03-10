@@ -18,9 +18,14 @@
               sequence="20"/>
 
     <menuitem id="menu_fms_configuration"
-              name="Configuration"
+              name="Master Data"
               parent="menu_fms_root"
-              sequence="30"/>
+              sequence="40"/>
+    <menuitem id="menu_fms_sla_rules"
+          name="SLA Rules"
+          parent="menu_fms_configuration"
+          action="action_fms_sla_rule"
+          sequence="40"/>
 
     <!-- Operations items -->
     <menuitem id="menu_fms_ticket"
@@ -43,7 +48,7 @@
 
     <!-- Vendors -->
     <menuitem id="menu_fms_vendor"
-              name="vendors"
+              name="Vendors"
               parent="menu_fms_vendors_root"
               action="action_fms_vendors"
               sequence="20"/>
@@ -71,7 +76,7 @@
     <menuitem id="menu_fms_billing"
               name="Billing"
               parent="menu_fms_root"
-              sequence="40"/>
+              sequence="30"/>
 
     <menuitem id="menu_fms_billing_run"
               name="Billing Run"
