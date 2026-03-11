@@ -9,6 +9,7 @@ from werkzeug.urls import url_encode
 import logging
 from markupsafe import Markup
 from odoo.tools.translate import LazyTranslate
+import base64
 
 SIGN_UP_REQUEST_PARAMS = {
     'db', 'login', 'debug', 'token', 'message', 'error', 'scope', 'mode',
@@ -18,13 +19,29 @@ SIGN_UP_REQUEST_PARAMS = {
     # FMS custom fields
     'fms_company', 'fms_phone',
     'fms_facility_type', 'fms_services_needed', 'fms_num_sites',
-    'fms_service_category', 'fms_coverage_region',
+    'fms_service_category', 'fms_coverage_region', 'service_id',
     'fms_registration_no', 'fms_certifications', 'fms_company_profile',
+    'fms_aadhaar_number', 'fms_pan_number',
 }
 
 _logger = logging.getLogger(__name__)
 _lt = LazyTranslate(__name__)
 
+def _save_document(partner, file_storage, doc_type):
+    if not file_storage or not file_storage.filename:
+        return False
+    file_data = file_storage.read()
+    if not file_data:
+        return False
+    label = 'Aadhaar' if doc_type == 'aadhaar' else 'PAN'
+    attachment = request.env['ir.attachment'].sudo().create({
+        'name':      f'{label}_{partner.name}_{file_storage.filename}',
+        'res_model': 'res.partner',
+        'res_id':    partner.id,
+        'datas':     base64.b64encode(file_data).decode(),
+        'mimetype':  file_storage.mimetype or 'application/octet-stream',
+    })
+    return attachment.id
 
 def _enrich_partner(partner, role, qcontext):
     """Write FMS data onto the partner record after successful signup."""
@@ -46,25 +63,46 @@ def _enrich_partner(partner, role, qcontext):
             partner.sudo().write({'category_id': [(4, tag.id)]})
 
     elif role == 'vendor':
+        # Save uploaded docs BEFORE write so IDs go into vals
+        aadhaar_file = request.httprequest.files.get('fms_aadhaar_doc')
+        pan_file = request.httprequest.files.get('fms_pan_doc')
+        aadhaar_att_id = _save_document(partner, aadhaar_file, 'aadhaar')
+        pan_att_id = _save_document(partner, pan_file, 'pan')
         vals = {
             'is_fms_vendor':        True,
             'supplier_rank':        1,
             'is_company':           True,
-            'fms_service_category': qcontext.get('fms_service_category') or False,
+            # 'fms_service_category': qcontext.get('fms_service_category') or False,
             'fms_coverage_region':  qcontext.get('fms_coverage_region') or False,
             'fms_registration_no':  qcontext.get('fms_registration_no') or False,
             'fms_certifications':   qcontext.get('fms_certifications') or False,
             'fms_company_profile':  qcontext.get('fms_company_profile') or False,
             'fms_approval_state':   'pending',
+            'city': qcontext.get('city') or False,
             'phone':                qcontext.get('fms_phone') or False,
+            'fms_aadhaar_number': qcontext.get('fms_aadhaar_number') or False,
+            'fms_pan_number': (qcontext.get('fms_pan_number') or '').upper() or False,
+            'fms_aadhaar_doc': aadhaar_att_id or False,
+            'fms_pan_doc': pan_att_id or False,
         }
         # For vendors the company name becomes the partner name
         if qcontext.get('fms_company'):
             vals['name'] = qcontext['fms_company']
+
         partner.sudo().write(vals)
         tag = env.ref('registration_process.partner_tag_fms_vendor', raise_if_not_found=False)
         if tag:
             partner.sudo().write({'category_id': [(4, tag.id)]})
+        if qcontext.get('service_id'):
+            try:
+                product_id = int(qcontext['service_id'])
+                # Store the product name as the category label
+                product = request.env['product.template'].sudo().browse(product_id)
+                if product.exists():
+                    vals['service_id'] = product  # store name in Char field
+            except (ValueError, TypeError):
+                vals['service_id'] = qcontext.get('service_id')
+        partner.sudo().write(vals)
 
     _logger.info('FMS signup: partner %s (id=%s) created as %s', partner.name, partner.id, role)
 
@@ -252,7 +290,19 @@ class AuthSignUp(AuthSignupHome):
                     _logger.warning('%s', e)
                     qcontext['error'] = _('Could not create a new account.') + Markup('<br/>') + str(e)
 
+        qcontext['fms_services'] = self._get_fms_services()
         response = request.render('registration_process.fms_signup_vendor', qcontext)
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         response.headers['Content-Security-Policy'] = "frame-ancestors 'self'"
         return response
+
+    def _get_fms_services(self):
+        """Fetch published products/services from website shop."""
+        Product = request.env['product.template'].sudo()
+        products = Product.search([
+            ('website_published', '=', True),
+            ('sale_ok', '=', True),
+        ], order='name asc')
+        return products
+
+

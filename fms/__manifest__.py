@@ -65,6 +65,7 @@ Multi-Tenant Ready:
         'portal',
         'web',
         'web_tour',
+        'project',
     ],
 
     'data': [
@@ -86,6 +87,7 @@ Multi-Tenant Ready:
         'views/sale_order_views.xml',
         'views/fms_sla_report_views.xml',
         'views/fms_menu.xml',
+        'views/fms_portal_template.xml',
 
     ],
 

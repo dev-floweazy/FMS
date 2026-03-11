@@ -6,33 +6,88 @@
     <field name="inherit_id" ref="base.view_partner_form"/>
     <field name="arch" type="xml">
 
-        <!-- Add checkbox near vendor info -->
         <xpath expr="//field[@name='function']" position="after">
             <field name="is_fms_vendor"/>
         </xpath>
 
-        <!-- New tab -->
+        <!-- Smart button showing doc count -->
+        <xpath expr="//div[@name='button_box']" position="inside">
+            <button name="action_view_vendor_documents"
+                    type="object"
+                    class="oe_stat_button"
+                    icon="fa-file-text-o"
+                    invisible="not is_fms_vendor">
+                <field name="fms_doc_count" widget="statinfo" string="KYC Docs"/>
+            </button>
+        </xpath>
+
         <xpath expr="//notebook" position="inside">
-            <page string="FMS Vendor"
-                  invisible="not is_fms_vendor">
+            <page string="FMS Vendor" invisible="not is_fms_vendor">
                 <group>
                     <group>
                         <field name="vendor_rating" widget="rating"/>
-                        <field name="vendor_service_category_ids"
-                               widget="many2many_tags"/>
+                        <field name="vendor_service_category_ids" widget="many2many_tags"/>
+                        <field name="service_id"/>
                     </group>
                 </group>
-<!--                <group string="Jobs">-->
-                    <field name="vendor_job_ids" string="Jobs" nolabel="0">
-                        <list>
+                <field name="vendor_job_ids" string="Jobs" nolabel="0">
+                    <list>
+                        <field name="name"/>
+                        <field name="state"/>
+                        <field name="site_id"/>
+                        <field name="scheduled_date"/>
+                    </list>
+                </field>
+            </page>
+
+            <page string="KYC Documents" invisible="not is_fms_vendor">
+                <group string="Identity Details">
+                    <group>
+                        <field name="fms_aadhaar_number"/>
+                        <field name="fms_pan_number"/>
+                        <field name="fms_kyc_verified"/>
+                    </group>
+                </group>
+
+                <group string="Aadhaar Document" invisible="not fms_aadhaar_doc">
+                    <group>
+                        <field name="fms_aadhaar_doc" string="File"/>
+                    </group>
+                    <div class="mt-2">
+                        <button name="action_download_aadhaar_doc"
+                                type="object"
+                                string="⬇ Download Aadhaar"
+                                class="btn btn-primary"/>
+                    </div>
+                </group>
+
+                <group string="PAN Document" invisible="not fms_pan_doc">
+                    <group>
+                        <field name="fms_pan_doc" string="File"/>
+                    </group>
+                    <div class="mt-2">
+                        <button name="action_download_pan_doc"
+                                type="object"
+                                string="⬇ Download PAN"
+                                class="btn btn-primary"/>
+                    </div>
+                </group>
+
+                <div invisible="fms_aadhaar_doc or fms_pan_doc"
+                     class="alert alert-warning" role="alert">
+                    No documents uploaded yet.
+                </div>
+
+                <group string="All Uploaded Attachments">
+                    <field name="fms_vendor_attachment_ids" nolabel="1">
+                        <list create="false" delete="false" open_form_view="true">
                             <field name="name"/>
-                            <field name="state"/>
-                            <field name="site_id"/>
-                            <field name="scheduled_date"/>
+                            <field name="mimetype" string="File Type"/>
+                            <field name="file_size" string="Size (bytes)"/>
+                            <field name="create_date" string="Uploaded On" readonly="1"/>
                         </list>
                     </field>
-<!--                </group>-->
-
+                </group>
             </page>
         </xpath>
 
