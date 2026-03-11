@@ -14,3 +14,4 @@ from . import product_product
 from .import fms_scope_approval
 from .import sale_order
 from .import fms_sla_report
+from . import project_task

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- NEW TICKET FORM — /fms/ticket/new -->
+<template id="fms_portal_new_ticket" name="FMS - New Ticket">
+    <t t-call="portal.portal_layout">
+        <div class="container mt-4 mb-5">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+
+                    <nav aria-label="breadcrumb" class="mb-3">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="/fms/tickets">My Tickets</a></li>
+                            <li class="breadcrumb-item active">New Request</li>
+                        </ol>
+                    </nav>
+
+                    <div class="d-flex align-items-center mb-4 gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white"
+                             style="width:48px;height:48px;flex-shrink:0;">
+                            <i class="fa fa-ticket fa-lg"/>
+                        </div>
+                        <div>
+                            <h3 class="mb-0 fw-bold">Submit a Service Request</h3>
+                            <p class="text-muted mb-0 small">Our team will review and assign your request promptly.</p>
+                        </div>
+                    </div>
+
+                    <t t-if="error">
+                        <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                            <i class="fa fa-exclamation-circle"/>
+                            <span t-out="error"/>
+                        </div>
+                    </t>
+
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <form action="/fms/ticket/submit" method="post"
+                                  enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token"
+                                       t-att-value="request.csrf_token()"/>
+
+                                <div class="mb-4">
+                                    <label for="site_id" class="form-label fw-semibold">
+                                        <i class="fa fa-map-marker text-primary me-1"/>
+                                        Site / Location <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="site_id" id="site_id" class="form-select" required="required">
+                                        <option value="">— Select a site —</option>
+                                        <t t-foreach="sites" t-as="site">
+                                            <option t-att-value="site.id"
+                                                    t-att-selected="values and str(values.get('site_id')) == str(site.id)">
+                                                <t t-out="site.name"/>
+                                                <t t-if="site.city"> — <t t-out="site.city"/></t>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="service_category_id" class="form-label fw-semibold">
+                                        <i class="fa fa-wrench text-primary me-1"/>
+                                        Service Category <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="service_category_id" id="service_category_id"
+                                            class="form-select" required="required">
+                                        <option value="">— Select a category —</option>
+                                        <t t-foreach="categories" t-as="cat">
+                                            <option t-att-value="cat.id"
+                                                    t-att-selected="values and str(values.get('service_category_id')) == str(cat.id)">
+                                                <t t-out="cat.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="description" class="form-label fw-semibold">
+                                        <i class="fa fa-align-left text-primary me-1"/>
+                                        Issue Description <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea name="description" id="description"
+                                              class="form-control" rows="5" required="required"
+                                              placeholder="Describe the issue in detail — what is the problem, where exactly, and any relevant context…"><t t-if="values" t-out="values.get('description', '')"/></textarea>
+                                    <div class="form-text">The more detail you provide, the faster we can resolve your request.</div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">
+                                        <i class="fa fa-paperclip text-primary me-1"/>
+                                        Attachments <span class="text-muted fw-normal">(optional)</span>
+                                    </label>
+                                    <input type="file" name="attachments" class="form-control"
+                                           accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx"
+                                           multiple="multiple"/>
+                                    <div class="form-text">Photos, documents, PDFs. You can select multiple files.</div>
+                                </div>
+
+                                <hr class="my-4"/>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="/fms/tickets" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left me-1"/> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary px-4">
+                                        <i class="fa fa-paper-plane me-1"/> Submit Request
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 bg-light mt-3">
+                        <div class="card-body py-3 px-4">
+                            <div class="row text-center g-3">
+                                <div class="col-4">
+                                    <i class="fa fa-clock-o text-primary mb-1 d-block fa-lg"/>
+                                    <small class="text-muted">Reviewed within<br/><strong>2 hours</strong></small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="fa fa-bell text-primary mb-1 d-block fa-lg"/>
+                                    <small class="text-muted">Email updates<br/><strong>at every step</strong></small>
+                                </div>
+                                <div class="col-4">
+                                    <i class="fa fa-eye text-primary mb-1 d-block fa-lg"/>
+                                    <small class="text-muted">Track status<br/><strong>in real time</strong></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </t>
+</template>
+
+
+<!-- TICKET LIST — /fms/tickets -->
+<template id="fms_portal_ticket_list" name="FMS - My Tickets">
+    <t t-call="portal.portal_layout">
+        <div class="container mt-4 mb-5">
+
+            <t t-if="submitted">
+                <div class="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
+                    <i class="fa fa-check-circle fa-lg"/>
+                    <span>Ticket <strong t-out="submitted"/> submitted successfully. Our team will be in touch shortly.</span>
+                </div>
+            </t>
+
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white"
+                         style="width:48px;height:48px;flex-shrink:0;">
+                        <i class="fa fa-list-alt fa-lg"/>
+                    </div>
+                    <div>
+                        <h3 class="mb-0 fw-bold">My Service Requests</h3>
+                        <p class="text-muted mb-0 small"><t t-out="len(tickets)"/> ticket(s) found</p>
+                    </div>
+                </div>
+                <a href="/fms/ticket/new" class="btn btn-primary">
+                    <i class="fa fa-plus me-1"/> New Request
+                </a>
+            </div>
+
+            <t t-if="tickets">
+                <div class="card shadow-sm border-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Ticket #</th>
+                                    <th>Site</th>
+                                    <th>Category</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="tickets" t-as="ticket">
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-primary">
+                                            <t t-out="ticket.name"/>
+                                        </td>
+                                        <td>
+                                            <i class="fa fa-map-marker text-muted me-1"/>
+                                            <t t-out="ticket.site_id.name or '—'"/>
+                                        </td>
+                                        <td><t t-out="ticket.service_category_id.name or '—'"/></td>
+                                        <td class="text-muted small">
+                                            <t t-out="ticket.requested_date.strftime('%d %b %Y, %H:%M') if ticket.requested_date else '—'"/>
+                                        </td>
+                                        <td>
+                                            <t t-if="ticket.state == 'draft'">
+                                                <span class="badge rounded-pill bg-secondary">Draft</span>
+                                            </t>
+                                            <t t-elif="ticket.state == 'assigned'">
+                                                <span class="badge rounded-pill bg-info text-dark">Assigned</span>
+                                            </t>
+                                            <t t-elif="ticket.state == 'in_progress'">
+                                                <span class="badge rounded-pill bg-primary">In Progress</span>
+                                            </t>
+                                            <t t-elif="ticket.state == 'pending'">
+                                                <span class="badge rounded-pill bg-warning text-dark">Pending</span>
+                                            </t>
+                                            <t t-elif="ticket.state == 'resolved'">
+                                                <span class="badge rounded-pill bg-success">Resolved</span>
+                                            </t>
+                                            <t t-elif="ticket.state == 'closed'">
+                                                <span class="badge rounded-pill bg-dark">Closed</span>
+                                            </t>
+                                            <t t-elif="ticket.state == 'cancelled'">
+                                                <span class="badge rounded-pill bg-danger">Cancelled</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span class="badge rounded-pill bg-secondary"><t t-out="ticket.state"/></span>
+                                            </t>
+                                        </td>
+                                        <td>
+                                            <t t-if="ticket.job_ids">
+                                                <t t-set="so" t-value="request.env['sale.order'].sudo().search([('origin', 'in', ticket.job_ids.mapped('name'))], limit=1)"/>
+                                                <t t-if="so">
+                                                    <a t-att-href="'/my/orders/%d?access_token=%s' % (so.id, so.access_token)"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fa fa-file-text-o me-1"/> Quotation
+                                                    </a>
+                                                </t>
+                                            </t>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+
+            <t t-if="not tickets">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <i class="fa fa-inbox fa-3x text-muted mb-3 d-block"/>
+                        <h5 class="fw-semibold">No tickets yet</h5>
+                        <p class="text-muted mb-4">You haven't submitted any service requests yet.</p>
+                        <a href="/fms/ticket/new" class="btn btn-primary">
+                            <i class="fa fa-plus me-1"/> Submit your first request
+                        </a>
+                    </div>
+                </div>
+            </t>
+
+        </div>
+    </t>
+</template>
+
+    <!-- Add FMS Tickets card on portal home -->
+<template id="fms_portal_my_home" inherit_id="portal.portal_my_home" customize_show="True" name="FMS: My Tickets">
+    <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+        <t t-call="portal.portal_docs_entry">
+            <t t-set="icon" t-value="'/static/img/icons/service.png'"/>
+            <t t-set="title">My Tickets</t>
+            <t t-set="text">Submit and track your facility service requests</t>
+            <t t-set="url" t-value="'/fms/tickets'"/>
+            <t t-set="placeholder_count" t-value="'ticket_count'"/>
+        </t>
+    </xpath>
+</template>
+
+    <!-- Website top navigation menu item -->
+<template id="fms_website_menu" inherit_id="website.layout">
+    <xpath expr="//ul[hasclass('navbar-nav')]" position="inside">
+        <li class="nav-item">
+            <a class="nav-link" href="/fms/ticket/new">Book Your Facility</a>
+        </li>
+    </xpath>
+</template>
+
+
+<!-- 403 PAGE -->
+<template id="fms_portal_403" name="FMS - Access Denied">
+    <t t-call="portal.portal_layout">
+        <div class="container mt-5 text-center">
+            <i class="fa fa-lock fa-4x text-muted mb-3 d-block"/>
+            <h3 class="fw-bold">Access Restricted</h3>
+            <p class="text-muted">This page is only available to registered FMS customers.</p>
+            <a href="/web/login" class="btn btn-primary mt-2">Sign In</a>
+        </div>
+    </t>
+</template>
+
+</odoo>

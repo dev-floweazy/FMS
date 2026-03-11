@@ -79,6 +79,17 @@
                                    widget="statinfo"
                                    string="Sales Orders"/>
                         </button>
+
+                        <button name="action_view_tasks"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-tasks">
+
+                            <field name="task_count"
+                                   widget="statinfo"
+                                   string="Tasks"/>
+                        </button>
+
                         <button name="action_view_purchase_orders"
                                 type="object"
                                 class="oe_stat_button"

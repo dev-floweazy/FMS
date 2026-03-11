@@ -97,6 +97,68 @@ class FMSJob(models.Model):
     sla_breached = fields.Boolean(
         compute='_compute_sla_breached', store=False)
 
+    vendor_task_id = fields.Many2one('project.task', string='Vendor Task', copy=False)
+    task_count = fields.Integer(
+        string="Tasks",
+        compute="_compute_task_count"
+    )
+
+    def _create_or_update_project_task(self, state):
+        """Create/update project.task for vendor and customer when job is assigned or scheduled."""
+        ProjectTask = self.env['project.task'].sudo()
+
+        for job in self:
+            # ── Determine deadline ──────────────────────────────────────
+            deadline = False
+            if state == 'scheduled' and job.scheduled_date:
+                deadline = job.scheduled_date.date()
+
+            task_name = f'[{job.name}] {job.ticket_id.name if job.ticket_id else "Job"}'
+            description = f"""
+                <p><b>Job:</b> {job.name}</p>
+                <p><b>Site:</b> {job.site_id.name if job.site_id else '-'}</p>
+                <p><b>Service:</b> {job.service_category_id.name if job.service_category_id else '-'}</p>
+                <p><b>Scheduled:</b> {job.scheduled_date or '-'}</p>
+                <p><b>Description:</b> {job.description or '-'}</p>
+            """
+
+            # ── VENDOR TASK ─────────────────────────────────────────────
+            if job.vendor_id:
+                # # Find or create vendor project
+                # vendor_project = self.env['project.project'].sudo().search([
+                #     ('name', '=', f'FMS Vendor: {job.vendor_id.name}'),
+                # ], limit=1)
+                # if not vendor_project:
+
+                vendor_project = self.env['project.project'].sudo().create({
+                    'name': f'FMS Vendor: {job.vendor_id.name}',
+                    'partner_id': job.vendor_id.id,
+                    'privacy_visibility': 'employees',
+                })
+
+                # Check if task already exists for this job
+                # vendor_task = ProjectTask.search([
+                #     ('project_id', '=', vendor_project.id),
+                #     ('fms_job_id', '=', job.id),
+                # ], limit=1)
+
+                task_vals = {
+                    'name': task_name,
+                    'project_id': vendor_project.id,
+                    'partner_id': job.vendor_id.id,
+                    'description': description,
+                    'fms_job_id': job.id,
+                    'date_deadline': deadline,
+                }
+                if job.assigned_user_id:
+                    task_vals['user_ids'] = [(4, job.assigned_user_id.id)]
+
+                # if vendor_task:
+                # vendor_task.write(task_vals)
+                # else:
+                vendor_task = ProjectTask.create(task_vals)
+
+                job.vendor_task_id = vendor_task.id
     # ---------------------------------------------------------
     # COMPUTE TOTALS
     # ---------------------------------------------------------
@@ -406,6 +468,39 @@ class FMSJob(models.Model):
     # ---------------------------------------------------------
     # SMART BUTTONS
     # ---------------------------------------------------------
+
+    def _compute_task_count(self):
+        for job in self:
+            job.task_count = self.env['project.task'].search_count([
+                ('fms_job_id', '=', job.id)
+            ])
+
+    def action_view_tasks(self):
+        self.ensure_one()
+
+        tasks = self.env['project.task'].search([
+            ('fms_job_id', '=', self.id)
+        ])
+
+        if len(tasks) == 1:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Task',
+                'res_model': 'project.task',
+                'view_mode': 'form',
+                'res_id': tasks.id,
+                'target': 'current',
+            }
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Tasks',
+            'res_model': 'project.task',
+            'view_mode': 'list,form',
+            'domain': [('fms_job_id', '=', self.id)],
+            'target': 'current',
+        }
+
     def action_view_sale_orders(self):
         self.ensure_one()
         sale_orders = self.env['sale.order'].search(
@@ -560,6 +655,7 @@ class FMSJob(models.Model):
                 raise UserError(_('Only draft jobs can be assigned.'))
             job.state = 'assigned'
             job.message_post(body='📋 Job assigned.')
+            job._create_or_update_project_task('assigned')
 
     def action_schedule(self):
         for job in self:
@@ -568,6 +664,7 @@ class FMSJob(models.Model):
             if not job.scheduled_date:
                 raise UserError(_('Please set a Scheduled Date before scheduling.'))
             job.state = 'scheduled'
+            job._create_or_update_project_task('scheduled')
             job.message_post(body='📅 Job scheduled.')
 
     def action_start(self):

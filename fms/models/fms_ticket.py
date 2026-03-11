@@ -8,6 +8,18 @@ class FMSTicket(models.Model):
     _description = 'FMS Ticket'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    # Quotation smart button
+    so_count = fields.Integer(
+        string='Quotations',
+        compute='_compute_so_count',
+    )
+    sale_order_id = fields.Many2one(
+        'sale.order',
+        string='Quotation',
+        compute='_compute_sale_order_id',
+        store=False,
+    )
+
     name = fields.Char(string='Ticket Number', required=True, copy=False,
                        default='New', readonly=True)
     partner_id = fields.Many2one('res.partner', string='Customer',
@@ -69,6 +81,36 @@ class FMSTicket(models.Model):
         string="Attachments"
     )
     internal_notes = fields.Html('Internal Notes')
+    so_count = fields.Integer(
+        string='Quotations',
+        compute='_compute_so_count',
+    )
+
+    def _compute_so_count(self):
+        for ticket in self:
+            ticket.so_count = self.env['sale.order'].search_count([
+                ('origin', 'in', ticket.job_ids.mapped('name'))
+            ]) if ticket.job_ids else 0
+
+    def action_view_quotation(self):
+        self.ensure_one()
+        sale_orders = self.env['sale.order'].search([
+            ('origin', 'in', self.job_ids.mapped('name'))
+        ])
+        if len(sale_orders) == 1:
+            so = sale_orders
+            return {
+                'type': 'ir.actions.act_url',
+                'url': '/my/orders/%d?access_token=%s' % (so.id, so.access_token),
+                'target': 'self',
+            }
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Quotations',
+            'res_model': 'sale.order',
+            'view_mode': 'list,form',
+            'domain': [('origin', 'in', self.job_ids.mapped('name'))],
+        }
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -76,6 +118,45 @@ class FMSTicket(models.Model):
             if vals.get('name', 'New') == 'New':
                 vals['name'] = self.env['ir.sequence'].next_by_code('fms.ticket') or 'New'
         return super().create(vals_list)
+
+    def _compute_so_count(self):
+        for ticket in self:
+            ticket.so_count = self.env['sale.order'].search_count([
+                ('origin', 'in', ticket.job_ids.mapped('name'))
+            ]) if ticket.job_ids else 0
+
+    def _compute_sale_order_id(self):
+        for ticket in self:
+            if ticket.job_ids:
+                so = self.env['sale.order'].search([
+                    ('origin', 'in', ticket.job_ids.mapped('name'))
+                ], order='id desc', limit=1)
+                ticket.sale_order_id = so
+            else:
+                ticket.sale_order_id = False
+
+    def action_view_quotation(self):
+        self.ensure_one()
+        sale_orders = self.env['sale.order'].search([
+            ('origin', 'in', self.job_ids.mapped('name'))
+        ])
+        if len(sale_orders) == 1:
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Quotation',
+                'res_model': 'sale.order',
+                'view_mode': 'form',
+                'res_id': sale_orders.id,
+                'target': 'current',
+            }
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Quotations',
+            'res_model': 'sale.order',
+            'view_mode': 'list,form',
+            'domain': [('origin', 'in', self.job_ids.mapped('name'))],
+            'target': 'current',
+        }
 
     @api.depends('service_category_id', 'requested_date', 'priority')
     def _compute_sla(self):

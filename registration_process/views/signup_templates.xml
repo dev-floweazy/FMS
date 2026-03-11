@@ -412,18 +412,18 @@ select.fms-sel option { background:#0f2040; }
                         </div>
                     </div>
 
-                    <div class="fms-sec">Services Required</div>
-                    <input type="hidden" name="fms_services_needed" id="csvc"/>
-                    <div class="fms-chips" id="csvc_chips">
-                        <span class="fms-chip" data-v="HVAC"          onclick="fChip(this,'csvc_chips','csvc')">🔧 HVAC</span>
-                        <span class="fms-chip" data-v="Electrical"    onclick="fChip(this,'csvc_chips','csvc')">💡 Electrical</span>
-                        <span class="fms-chip" data-v="Plumbing"      onclick="fChip(this,'csvc_chips','csvc')">🚿 Plumbing</span>
-                        <span class="fms-chip" data-v="Cleaning"      onclick="fChip(this,'csvc_chips','csvc')">🧹 Cleaning</span>
-                        <span class="fms-chip" data-v="Security"      onclick="fChip(this,'csvc_chips','csvc')">🔒 Security</span>
-                        <span class="fms-chip" data-v="Landscaping"   onclick="fChip(this,'csvc_chips','csvc')">🌿 Landscaping</span>
-                        <span class="fms-chip" data-v="Fire Safety"   onclick="fChip(this,'csvc_chips','csvc')">🔥 Fire Safety</span>
-                        <span class="fms-chip" data-v="Waste Mgmt"    onclick="fChip(this,'csvc_chips','csvc')">♻️ Waste Mgmt</span>
-                    </div>
+<!--                    <div class="fms-sec">Services Required</div>-->
+<!--                    <input type="hidden" name="fms_services_needed" id="csvc"/>-->
+<!--                    <div class="fms-chips" id="csvc_chips">-->
+<!--                        <span class="fms-chip" data-v="HVAC"          onclick="fChip(this,'csvc_chips','csvc')">🔧 HVAC</span>-->
+<!--                        <span class="fms-chip" data-v="Electrical"    onclick="fChip(this,'csvc_chips','csvc')">💡 Electrical</span>-->
+<!--                        <span class="fms-chip" data-v="Plumbing"      onclick="fChip(this,'csvc_chips','csvc')">🚿 Plumbing</span>-->
+<!--                        <span class="fms-chip" data-v="Cleaning"      onclick="fChip(this,'csvc_chips','csvc')">🧹 Cleaning</span>-->
+<!--                        <span class="fms-chip" data-v="Security"      onclick="fChip(this,'csvc_chips','csvc')">🔒 Security</span>-->
+<!--                        <span class="fms-chip" data-v="Landscaping"   onclick="fChip(this,'csvc_chips','csvc')">🌿 Landscaping</span>-->
+<!--                        <span class="fms-chip" data-v="Fire Safety"   onclick="fChip(this,'csvc_chips','csvc')">🔥 Fire Safety</span>-->
+<!--                        <span class="fms-chip" data-v="Waste Mgmt"    onclick="fChip(this,'csvc_chips','csvc')">♻️ Waste Mgmt</span>-->
+<!--                    </div>-->
 
                     <div class="fms-sec">Agreement</div>
                     <label class="fms-agree">
@@ -485,7 +485,7 @@ select.fms-sel option { background:#0f2040; }
                     <div class="fms-info"><i class="fa fa-info-circle" style="flex-shrink:0;margin-top:2px;"></i><span t-out="message"/></div>
                 </t>
 
-                <form action="/fms/signup/vendor" method="post">
+                <form action="/fms/signup/vendor" method="post" enctype="multipart/form-data">
                     <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
                     <input type="hidden" name="role" value="vendor"/>
 
@@ -542,36 +542,21 @@ select.fms-sel option { background:#0f2040; }
                         </div>
                         <div>
                             <label class="fms-lbl">Primary Service Category *</label>
-                            <div class="fms-iw">
-                                <i class="fa fa-wrench fms-ico"></i>
-                                <select name="fms_service_category" class="fms-sel" required="required">
-                                    <option value="">Select service…</option>
-                                    <option value="hvac">HVAC &amp; Mechanical</option>
-                                    <option value="electrical">Electrical Systems</option>
-                                    <option value="plumbing">Plumbing &amp; Sanitation</option>
-                                    <option value="cleaning">Cleaning &amp; Janitorial</option>
-                                    <option value="security">Security &amp; Access Control</option>
-                                    <option value="landscaping">Landscaping &amp; Grounds</option>
-                                    <option value="fire">Fire Safety &amp; Suppression</option>
-                                    <option value="waste">Waste Management</option>
-                                    <option value="elevators">Elevators &amp; Lifts</option>
-                                    <option value="civil">General Civil Works</option>
-                                    <option value="multi">Multiple / General FM</option>
-                                </select>
-                            </div>
+                                <div class="fms-iw">
+                                    <i class="fa fa-wrench fms-ico"></i>
+                                    <select name="service_id" class="fms-sel" required="required">
+                                        <option value="">Select service…</option>
+                                        <t t-foreach="fms_services" t-as="svc">
+                                            <option t-att-value="svc.id" t-esc="svc.name"/>
+                                        </t>
+                                    </select>
+                                </div>
                         </div>
                         <div>
-                            <label class="fms-lbl">Coverage Region</label>
+                            <label class="fms-lbl">Coverage Area</label>
                             <div class="fms-iw">
-                                <i class="fa fa-map fms-ico"></i>
-                                <select name="fms_coverage_region" class="fms-sel">
-                                    <option value="">Select…</option>
-                                    <option value="north">North</option>
-                                    <option value="south">South</option>
-                                    <option value="east">East</option>
-                                    <option value="west">West</option>
-                                    <option value="national">Nationwide</option>
-                                </select>
+                                <i class="fa fa-map-marker fms-ico"></i>
+                                <input name="city" type="text" class="fms-in" placeholder="e.g. Dubai, Mumbai…"/>
                             </div>
                         </div>
                     </div>
@@ -581,18 +566,59 @@ select.fms-sel option { background:#0f2040; }
                         <textarea name="fms_company_profile" class="fms-ta" placeholder="Describe your company, years in operation, key capabilities…"></textarea>
                     </div>
 
-                    <div class="fms-sec">Certifications &amp; Specializations</div>
-                    <input type="hidden" name="fms_certifications" id="vcerts"/>
-                    <div class="fms-chips" id="vcert_chips">
-                        <span class="fms-chip fms-chip-g" data-v="ISO 45001" onclick="fChip(this,'vcert_chips','vcerts')">ISO 45001</span>
-                        <span class="fms-chip fms-chip-g" data-v="LEED"      onclick="fChip(this,'vcert_chips','vcerts')">LEED</span>
-                        <span class="fms-chip fms-chip-g" data-v="ASHRAE"    onclick="fChip(this,'vcert_chips','vcerts')">ASHRAE</span>
-                        <span class="fms-chip fms-chip-g" data-v="OSHA 30"   onclick="fChip(this,'vcert_chips','vcerts')">OSHA 30</span>
-                        <span class="fms-chip fms-chip-g" data-v="NFPA 72"   onclick="fChip(this,'vcert_chips','vcerts')">NFPA 72</span>
-                        <span class="fms-chip fms-chip-g" data-v="BMS/BAS"   onclick="fChip(this,'vcert_chips','vcerts')">BMS/BAS</span>
-                        <span class="fms-chip fms-chip-g" data-v="Cleanroom" onclick="fChip(this,'vcert_chips','vcerts')">Cleanroom</span>
-                        <span class="fms-chip fms-chip-g" data-v="HVAC-R"    onclick="fChip(this,'vcert_chips','vcerts')">HVAC-R</span>
-                    </div>
+                    <div class="fms-sec">KYC Documents</div>
+                        <div class="fms-row">
+                            <div>
+                                <label class="fms-lbl">Aadhaar Number *</label>
+                                <div class="fms-iw">
+                                    <i class="fa fa-id-card fms-ico"></i>
+                                    <input name="fms_aadhaar_number" type="text" class="fms-in"
+                                           placeholder="12-digit Aadhaar number"
+                                           maxlength="12" pattern="\d{12}"
+                                           title="Enter 12-digit Aadhaar number"
+                                           required="required"/>
+                                </div>
+                                <label class="fms-lbl" style="margin-top:.5rem;">Upload Aadhaar *</label>
+                                <input name="fms_aadhaar_doc" type="file" class="fms-in"
+                                       accept=".pdf,.jpg,.jpeg,.png" required="required"
+                                       style="padding:8px 12px;cursor:pointer;"/>
+                                <span style="font-size:.7rem;color:rgba(255,255,255,.28);margin-top:3px;display:block;">
+                                    PDF, JPG or PNG · Max 5 MB
+                                </span>
+                            </div>
+                            <div>
+                                <label class="fms-lbl">PAN Number *</label>
+                                <div class="fms-iw">
+                                    <i class="fa fa-credit-card fms-ico"></i>
+                                    <input name="fms_pan_number" type="text" class="fms-in"
+                                           placeholder="e.g. ABCDE1234F"
+                                           maxlength="10"
+                                           pattern="[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}"
+                                           title="Enter valid PAN e.g. ABCDE1234F"
+                                           required="required"
+                                           style="text-transform:uppercase;"/>
+                                </div>
+                                <label class="fms-lbl" style="margin-top:.5rem;">Upload PAN *</label>
+                                <input name="fms_pan_doc" type="file" class="fms-in"
+                                       accept=".pdf,.jpg,.jpeg,.png" required="required"
+                                       style="padding:8px 12px;cursor:pointer;"/>
+                                <span style="font-size:.7rem;color:rgba(255,255,255,.28);margin-top:3px;display:block;">
+                                    PDF, JPG or PNG · Max 5 MB
+                                </span>
+                            </div>
+                        </div>
+<!--                    <div class="fms-sec">Certifications &amp; Specializations</div>-->
+<!--                    <input type="hidden" name="fms_certifications" id="vcerts"/>-->
+<!--                    <div class="fms-chips" id="vcert_chips">-->
+<!--                        <span class="fms-chip fms-chip-g" data-v="ISO 45001" onclick="fChip(this,'vcert_chips','vcerts')">ISO 45001</span>-->
+<!--                        <span class="fms-chip fms-chip-g" data-v="LEED"      onclick="fChip(this,'vcert_chips','vcerts')">LEED</span>-->
+<!--                        <span class="fms-chip fms-chip-g" data-v="ASHRAE"    onclick="fChip(this,'vcert_chips','vcerts')">ASHRAE</span>-->
+<!--                        <span class="fms-chip fms-chip-g" data-v="OSHA 30"   onclick="fChip(this,'vcert_chips','vcerts')">OSHA 30</span>-->
+<!--                        <span class="fms-chip fms-chip-g" data-v="NFPA 72"   onclick="fChip(this,'vcert_chips','vcerts')">NFPA 72</span>-->
+<!--                        <span class="fms-chip fms-chip-g" data-v="BMS/BAS"   onclick="fChip(this,'vcert_chips','vcerts')">BMS/BAS</span>-->
+<!--                        <span class="fms-chip fms-chip-g" data-v="Cleanroom" onclick="fChip(this,'vcert_chips','vcerts')">Cleanroom</span>-->
+<!--                        <span class="fms-chip fms-chip-g" data-v="HVAC-R"    onclick="fChip(this,'vcert_chips','vcerts')">HVAC-R</span>-->
+<!--                    </div>-->
 
                     <div class="fms-sec">Agreement</div>
                     <label class="fms-agree">
