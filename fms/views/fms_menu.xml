@@ -5,18 +5,15 @@
               name="FMS"
               web_icon="fms,static/description/icon.png"
               sequence="10"/>
-
     <!-- Operations Menu -->
     <menuitem id="menu_fms_operations"
               name="Operations"
               parent="menu_fms_root"
               sequence="10"/>
-
     <menuitem id="menu_fms_vendors_root"
               name="Vendors"
               parent="menu_fms_root"
               sequence="20"/>
-
     <menuitem id="menu_fms_configuration"
               name="Master Data"
               parent="menu_fms_root"
@@ -26,76 +23,71 @@
           parent="menu_fms_configuration"
           action="action_fms_sla_rule"
           sequence="40"/>
-
     <!-- Operations items -->
     <menuitem id="menu_fms_ticket"
               name="Tickets"
               parent="menu_fms_operations"
               action="action_fms_ticket"
               sequence="10"/>
-
     <menuitem id="menu_fms_job"
               name="Jobs"
               parent="menu_fms_operations"
               action="action_fms_job"
               sequence="20"/>
-
     <menuitem id="menu_fms_scope_approvals"
               name="Scope Approvals"
               parent="menu_fms_operations"
               action="action_fms_scope_approval"
               sequence="30"/>
-
     <!-- Vendors -->
     <menuitem id="menu_fms_vendor"
               name="Vendors"
               parent="menu_fms_vendors_root"
               action="action_fms_vendors"
               sequence="20"/>
-
     <!-- Configuration items -->
     <menuitem id="menu_fms_service_category"
               name="Service Category"
               parent="menu_fms_configuration"
               action="action_fms_service_category"
               sequence="10"/>
-
     <menuitem id="menu_fms_site"
               name="Sites"
               parent="menu_fms_configuration"
               action="action_fms_site"
               sequence="20"/>
-
     <menuitem id="menu_fms_approval_rules"
               name="Scope Approval Rules"
               parent="menu_fms_configuration"
               action="action_fms_approval_rule"
               sequence="30"/>
-
+    <!-- Customer Rate Card -->
+    <menuitem id="menu_fms_rate_card"
+              name="Customer Rate Cards"
+              parent="menu_fms_configuration"
+              action="action_fms_rate_card"
+              sequence="30"/>
+    <!-- Vendor Rate Card -->
     <!-- Billing Menu -->
     <menuitem id="menu_fms_billing"
               name="Billing"
               parent="menu_fms_root"
               sequence="30"/>
-
     <menuitem id="menu_fms_billing_run"
               name="Billing Run"
               parent="menu_fms_billing"
               action="action_fms_consolidated_billing_wizard"
               sequence="10"/>
-
     <menuitem id="menu_fms_consolidated_billing"
               name="Consolidated Invoices"
               parent="menu_fms_billing"
               action="action_fms_consolidated_invoice"
               sequence="20"/>
-
     <menuitem id="menu_fms_invoices"
               name="Customer Invoices"
               parent="menu_fms_billing"
               action="account.action_move_out_invoice_type"
               sequence="30"/>
-
     <!-- Reports Menu -->
     <menuitem id="menu_fms_reports"
               name="Reports"
@@ -106,5 +98,10 @@
               parent="menu_fms_reports"
               action="action_fms_sla_report"
               sequence="10"/>
-
+    <!-- Vendor Rate Card -->
+    <menuitem id="menu_fms_vendor_rate_card"
+              name="Vendor Rate Cards"
+              parent="menu_fms_configuration"
+              action="action_fms_vendor_rate_card"
+              sequence="25"/>
 </odoo>

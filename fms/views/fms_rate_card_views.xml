@@ -87,15 +87,4 @@
     </record>
 
 
-    <!-- =====================================================
-        MENU
-    ====================================================== -->
-
-    <menuitem
-        id="menu_fms_rate_card"
-        name="Customer Rate Cards"
-        parent="menu_fms_configuration"
-        action="action_fms_rate_card"
-        sequence="30"/>
-
 </odoo>
