@@ -15,3 +15,5 @@ fms.access_fms_scope_approval,access_fms_scope_approval,fms.model_fms_scope_appr
 fms.access_fms_scope_approval_line,access_fms_scope_approval_line,fms.model_fms_scope_approval_line,base.group_user,1,1,1,1
 fms.access_fms_scope_rejection_wizard,access_fms_scope_rejection_wizard,fms.model_fms_scope_rejection_wizard,base.group_user,1,1,1,1
 fms.access_fms_sla_report,access_fms_sla_report,fms.model_fms_sla_report,base.group_user,1,0,0,0
+fms.access_fms_vendor_rate_card,access_fms_vendor_rate_card,fms.model_fms_vendor_rate_card,base.group_user,1,1,1,1
+fms.access_fms_vendor_rate_card_manager,access_fms_vendor_rate_card_manager,fms.model_fms_vendor_rate_card,base.group_system,1,1,1,1

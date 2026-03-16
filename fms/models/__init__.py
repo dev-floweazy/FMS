@@ -15,3 +15,4 @@ from .import fms_scope_approval
 from .import sale_order
 from .import fms_sla_report
 from . import project_task
+from . import fms_vendor_rate_card
