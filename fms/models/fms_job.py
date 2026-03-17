@@ -3,7 +3,6 @@ from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 from datetime import timedelta
 
-
 class FMSJob(models.Model):
     _name = 'fms.job'
     _description = 'FMS Job/Work Order'
@@ -20,6 +19,20 @@ class FMSJob(models.Model):
     site_id = fields.Many2one(related='ticket_id.site_id', store=True)
     service_category_id = fields.Many2one(
         related='ticket_id.service_category_id', store=True)
+    
+    execution_type = fields.Selection([
+        ('fms_employee', 'FMS Employee'),
+        ('vendor', 'External Vendor'),
+    ], string='Execution Type', default='vendor', required=True, tracking=True,
+       help='Whether work is done by FMS employee or external vendor')
+    
+    employee_id = fields.Many2one(
+        'hr.employee',
+        string='Assigned Employee',
+        help='Select FMS employee if execution type is FMS Employee',
+        tracking=True
+    )
+    
     vendor_id = fields.Many2one(
         'res.partner',
         string='Vendor',
@@ -93,12 +106,10 @@ class FMSJob(models.Model):
         string="Tasks",
         compute="_compute_task_count"
     )
-
     def _create_or_update_project_task(self, state):
         """Create/update project.task for vendor and customer when job is assigned or scheduled."""
         ProjectTask = self.env['project.task'].sudo()
         for job in self:
-            # ── Determine deadline ──────────────────────────────────────
             deadline = False
             if state == 'scheduled' and job.scheduled_date:
                 deadline = job.scheduled_date.date()
@@ -110,23 +121,12 @@ class FMSJob(models.Model):
                 <p><b>Scheduled:</b> {job.scheduled_date or '-'}</p>
                 <p><b>Description:</b> {job.description or '-'}</p>
             """
-            # ── VENDOR TASK ─────────────────────────────────────────────
             if job.vendor_id:
-                # # Find or create vendor project
-                # vendor_project = self.env['project.project'].sudo().search([
-                #     ('name', '=', f'FMS Vendor: {job.vendor_id.name}'),
-                # ], limit=1)
-                # if not vendor_project:
                 vendor_project = self.env['project.project'].sudo().create({
                     'name': f'FMS Vendor: {job.vendor_id.name}',
                     'partner_id': job.vendor_id.id,
                     'privacy_visibility': 'employees',
                 })
-                # Check if task already exists for this job
-                # vendor_task = ProjectTask.search([
-                #     ('project_id', '=', vendor_project.id),
-                #     ('fms_job_id', '=', job.id),
-                # ], limit=1)
                 task_vals = {
                     'name': task_name,
                     'project_id': vendor_project.id,
@@ -137,12 +137,8 @@ class FMSJob(models.Model):
                 }
                 if job.assigned_user_id:
                     task_vals['user_ids'] = [(4, job.assigned_user_id.id)]
-                # if vendor_task:
-                # vendor_task.write(task_vals)
-                # else:
                 vendor_task = ProjectTask.create(task_vals)
                 job.vendor_task_id = vendor_task.id
-
     # ---------------------------------------------------------
     # COMPUTE TOTALS
     # ---------------------------------------------------------
@@ -153,8 +149,7 @@ class FMSJob(models.Model):
             job.total_price = sum(job.job_line_ids.mapped('subtotal_price'))
             job.margin = job.total_price - job.total_cost
             job.margin_percent = (
-                    job.margin / job.total_price) if job.total_price else 0
-
+                job.margin / job.total_price) if job.total_price else 0
     # ---------------------------------------------------------
     # SMART BUTTON COUNTS
     # ---------------------------------------------------------
@@ -165,7 +160,6 @@ class FMSJob(models.Model):
                     [('origin', 'like', job.name)])
                 if job.name and job.name != 'JOB' else 0
             )
-
     def _compute_purchase_order_count(self):
         for job in self:
             job.purchase_order_count = (
@@ -173,12 +167,10 @@ class FMSJob(models.Model):
                     [('origin', '=', job.name)])
                 if job.name and job.name != 'JOB' else 0
             )
-
     def _compute_scope_approval_count(self):
         for job in self:
             job.scope_approval_count = self.env['fms.scope.approval'].search_count(
                 [('job_id', '=', job.id)])
-
     # ---------------------------------------------------------
     # SLA
     # ---------------------------------------------------------
@@ -191,7 +183,6 @@ class FMSJob(models.Model):
                 ('priority', '=', priority),
                 ('active', '=', True)
             ], limit=1)
-
     @api.depends('sla_start_datetime', 'sla_rule_id')
     def _compute_sla_deadlines(self):
         for job in self:
@@ -203,7 +194,6 @@ class FMSJob(models.Model):
                 hours=job.sla_rule_id.response_time)
             job.sla_resolution_deadline = job.sla_start_datetime + timedelta(
                 hours=job.sla_rule_id.resolution_time)
-
     @api.depends('sla_resolution_deadline')
     def _compute_sla_breached(self):
         now = fields.Datetime.now()
@@ -211,7 +201,6 @@ class FMSJob(models.Model):
             job.sla_breached = bool(
                 job.sla_resolution_deadline
                 and now > job.sla_resolution_deadline)
-
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
@@ -220,7 +209,6 @@ class FMSJob(models.Model):
             if job.sla_rule_id and not job.sla_start_datetime:
                 job.sla_start_datetime = now
         return records
-
     # ---------------------------------------------------------
     # AUTO SO/PO — only original scope lines
     # ---------------------------------------------------------
@@ -228,7 +216,7 @@ class FMSJob(models.Model):
         for job in self:
             eligible = job.job_line_ids.filtered(
                 lambda l: l.line_type == 'original'
-                          and l.scope_state == 'na'
+                and l.scope_state == 'na'
             )
             if not eligible:
                 continue
@@ -241,6 +229,8 @@ class FMSJob(models.Model):
                 continue
             so_created = False
             po_created = False
+            
+            # SALES ORDER CREATION (ALWAYS - for customer revenue)
             existing_so_keys = set()
             if job.sale_order_id:
                 for sol in job.sale_order_id.order_line:
@@ -249,7 +239,7 @@ class FMSJob(models.Model):
             new_so_lines = [
                 l for l in eligible
                 if (l.product_id.id, l.quantity, l.unit_price)
-                   not in existing_so_keys
+                not in existing_so_keys
             ]
             if job.partner_id and new_so_lines:
                 so_vals = [(0, 0, {
@@ -266,32 +256,51 @@ class FMSJob(models.Model):
                 })
                 job.sale_order_id = so.id
                 so_created = True
-            existing_po_keys = set()
-            if job.purchase_order_id:
-                for pol in job.purchase_order_id.order_line:
-                    existing_po_keys.add(
-                        (pol.product_id.id, pol.product_qty, pol.price_unit))
-            new_po_lines = [
-                l for l in eligible
-                if (l.product_id.id, l.quantity, l.unit_cost)
-                   not in existing_po_keys
-            ]
-            if job.vendor_id and new_po_lines:
-                po_vals = [(0, 0, {
-                    'product_id': l.product_id.id,
-                    'name': l.description or l.product_id.name,
-                    'product_qty': l.quantity,
-                    'product_uom_id': l.uom_id.id or l.product_id.uom_id.id,
-                    'price_unit': l.unit_cost,
-                    'date_planned': fields.Datetime.now(),
-                }) for l in new_po_lines]
-                po = self.env['purchase.order'].create({
-                    'partner_id': job.vendor_id.id,
-                    'origin': job.name,
-                    'order_line': po_vals,
-                })
-                job.purchase_order_id = po.id
-                po_created = True
+            
+            # PURCHASE ORDER CREATION (ONLY IF VENDOR EXECUTION TYPE)
+            if job.execution_type == 'vendor' and job.vendor_id:
+                # External vendor - create PO
+                existing_po_keys = set()
+                if job.purchase_order_id:
+                    for pol in job.purchase_order_id.order_line:
+                        existing_po_keys.add(
+                            (pol.product_id.id, pol.product_qty, pol.price_unit))
+                new_po_lines = [
+                    l for l in eligible
+                    if (l.product_id.id, l.quantity, l.unit_cost)
+                    not in existing_po_keys
+                ]
+                if new_po_lines:
+                    po_vals = [(0, 0, {
+                        'product_id': l.product_id.id,
+                        'name': l.description or l.product_id.name,
+                        'product_qty': l.quantity,
+                        'product_uom_id': l.uom_id.id or l.product_id.uom_id.id,
+                        'price_unit': l.unit_cost,
+                        'date_planned': fields.Datetime.now(),
+                    }) for l in new_po_lines]
+                    po = self.env['purchase.order'].create({
+                        'partner_id': job.vendor_id.id,
+                        'origin': job.name,
+                        'order_line': po_vals,
+                    })
+                    job.purchase_order_id = po.id
+                    po_created = True
+            
+            elif job.execution_type == 'fms_employee':
+                # FMS Employee - NO PO, use internal cost allocation
+                if job.id:  # Only message if record is saved
+                    job.message_post(
+                        body='ℹ️ <b>FMS Employee Execution</b><br/>'
+                             'No Purchase Order will be created.<br/>'
+                             'Internal cost will be tracked via:'
+                             '<ul>'
+                             '<li>Employee timesheet cost</li>'
+                             '<li>Expense entries</li>'
+                             '<li>Internal analytic cost allocation</li>'
+                             '</ul>'
+                    )
+            
             if so_created or po_created:
                 job.auto_so_po_created = True
                 msg_parts = []
@@ -305,8 +314,8 @@ class FMSJob(models.Model):
                         f'✅ Purchase Order <a href="#" data-oe-model="purchase.order" '
                         f'data-oe-id="{job.purchase_order_id.id}">'
                         f'{job.purchase_order_id.name}</a> created automatically.')
-                job.message_post(body=' '.join(msg_parts))
-
+                if msg_parts and job.id:
+                    job.message_post(body=' '.join(msg_parts))
     # ---------------------------------------------------------
     # SCOPE APPROVAL TRIGGER
     # ---------------------------------------------------------
@@ -385,7 +394,6 @@ class FMSJob(models.Model):
                          f'Total: {additional_total:.2f} exceeds '
                          f'threshold of {rule.amount_threshold:.2f}.'
                 )
-
     # ---------------------------------------------------------
     # CREATE SO/PO FOR AUTO-APPROVED ADDITIONAL LINES
     # ---------------------------------------------------------
@@ -430,7 +438,6 @@ class FMSJob(models.Model):
                          f'data-oe-id="{po.id}">{po.name}</a> created for '
                          f'auto-approved additional scope.'
                 )
-
     # ---------------------------------------------------------
     # SMART BUTTONS
     # ---------------------------------------------------------
@@ -439,7 +446,6 @@ class FMSJob(models.Model):
             job.task_count = self.env['project.task'].search_count([
                 ('fms_job_id', '=', job.id)
             ])
-
     def action_view_tasks(self):
         self.ensure_one()
         tasks = self.env['project.task'].search([
@@ -462,7 +468,6 @@ class FMSJob(models.Model):
             'domain': [('fms_job_id', '=', self.id)],
             'target': 'current',
         }
-
     def action_view_sale_orders(self):
         self.ensure_one()
         sale_orders = self.env['sale.order'].search(
@@ -510,7 +515,6 @@ class FMSJob(models.Model):
             'domain': [('origin', 'like', self.name)],
             'target': 'current',
         }
-
     def action_view_purchase_orders(self):
         self.ensure_one()
         purchase_orders = self.env['purchase.order'].search(
@@ -559,7 +563,6 @@ class FMSJob(models.Model):
             'domain': [('origin', '=', self.name)],
             'target': 'current',
         }
-
     def action_view_invoice(self):
         self.ensure_one()
         invoice = self.invoice_id
@@ -580,7 +583,6 @@ class FMSJob(models.Model):
             'res_id': invoice.id,
             'target': 'current',
         }
-
     def action_view_scope_approvals(self):
         self.ensure_one()
         approvals = self.env['fms.scope.approval'].search(
@@ -602,22 +604,13 @@ class FMSJob(models.Model):
             'domain': [('job_id', '=', self.id)],
             'target': 'current',
         }
-
     # ---------------------------------------------------------
     # STATE ACTION METHODS
     # ---------------------------------------------------------
-    def action_create_sale_order(self):
-        pass
-
-    def action_create_purchase_order(self):
-        pass
-
-    def action_assign_vendor(self):
-        pass
-
-    def compute_margin(self):
-        pass
-
+    def action_create_sale_order(self): pass
+    def action_create_purchase_order(self): pass
+    def action_assign_vendor(self): pass
+    def compute_margin(self): pass
     def action_assign(self):
         for job in self:
             if job.state != 'draft':
@@ -625,7 +618,6 @@ class FMSJob(models.Model):
             job.state = 'assigned'
             job.message_post(body='📋 Job assigned.')
             job._create_or_update_project_task('assigned')
-
     def action_schedule(self):
         for job in self:
             if job.state not in ('draft', 'assigned'):
@@ -635,7 +627,6 @@ class FMSJob(models.Model):
             job.state = 'scheduled'
             job._create_or_update_project_task('scheduled')
             job.message_post(body='📅 Job scheduled.')
-
     def action_start(self):
         for job in self:
             if job.state in ('completed', 'invoiced', 'cancelled'):
@@ -643,7 +634,6 @@ class FMSJob(models.Model):
             job.state = 'in_progress'
             job.start_date = fields.Datetime.now()
             job.message_post(body='▶️ Job started.')
-
     def action_complete(self):
         for job in self:
             if job.state in ('invoiced', 'cancelled'):
@@ -653,21 +643,18 @@ class FMSJob(models.Model):
             job.state = 'completed'
             job.end_date = fields.Datetime.now()
             job.message_post(body='✅ Job marked as completed.')
-
     def action_create_invoice(self):
         for job in self:
             if job.state != 'completed':
                 raise UserError(_('Only completed jobs can be invoiced.'))
             job.state = 'invoiced'
             job.message_post(body='🧾 Job marked as invoiced.')
-
     def action_cancel(self):
         for job in self:
             if job.state == 'invoiced':
                 raise UserError(_('Cannot cancel an invoiced job.'))
             job.state = 'cancelled'
             job.message_post(body='❌ Job cancelled.')
-
     def action_reset_draft(self):
         for job in self:
             if job.state not in ('cancelled', 'assigned', 'scheduled'):
@@ -676,38 +663,24 @@ class FMSJob(models.Model):
             job.state = 'draft'
             job.message_post(body='🔄 Job reset to draft.')
 
-    # ═══════════════════════════════════════════════════════════════════════════════
-    # 🆕 VENDOR RATE CARD LOGIC - NEW METHOD ADDED HERE
-    # ═══════════════════════════════════════════════════════════════════════════════
-    @api.onchange('vendor_id')
-    def _onchange_vendor_id(self):
-        """
-        VENDOR RATE CARD LOGIC:
-        When vendor is assigned/changed, automatically refetch vendor rates
-        for all job lines that have products selected.
+    # EXECUTION TYPE ONCHANGE METHODS
+    @api.onchange('execution_type')
+    def _onchange_execution_type(self):
+        """When execution type changes, clear vendor/employee fields"""
+        if self.execution_type == 'fms_employee':
+            self.vendor_id = False
+            self.purchase_order_id = False
+        elif self.execution_type == 'vendor':
+            self.employee_id = False
 
-        This ensures all unit costs are updated to the latest vendor rate card.
-        """
-        for line in self.job_line_ids:
-            if line.product_id and self.vendor_id:
-                # Get the job date for rate lookup
-                job_date = (
-                    self.scheduled_date.date()
-                    if self.scheduled_date
-                    else fields.Date.context_today(self)
-                )
-
-                # Fetch vendor rate card for this product
-                vendor_rate = self.env['fms.vendor.rate.card'].get_rate_for_vendor(
-                    self.vendor_id.id,
-                    line.product_id.id,
-                    job_date
-                )
-
-                # Auto-populate unit cost if rate card exists
-                if vendor_rate:
-                    line.unit_cost = vendor_rate.unit_cost
-    # ═══════════════════════════════════════════════════════════════════════════════
+    @api.onchange('employee_id')
+    def _onchange_employee_id(self):
+        """When employee is assigned, auto-populate employee hourly cost in job lines"""
+        if self.employee_id and self.execution_type == 'fms_employee':
+            employee_cost = self.employee_id.timesheet_cost or 0
+            for line in self.job_line_ids:
+                if line.product_id:
+                    line.unit_cost = employee_cost
 
 
 # ---------------------------------------------------------------------------
@@ -742,7 +715,6 @@ class FMSJobLine(models.Model):
         ('rejected', 'Rejected'),
     ], default='na', string='Approval Status', readonly=True,
         help="Rejected lines remain on the job but cannot be billed.")
-
     @api.depends('quantity', 'unit_cost', 'unit_price')
     def _compute_subtotals(self):
         for line in self:
@@ -750,32 +722,19 @@ class FMSJobLine(models.Model):
             line.subtotal_price = line.quantity * line.unit_price
             line.margin = line.subtotal_price - line.subtotal_cost
 
-    # ═══════════════════════════════════════════════════════════════════════════════
-    # 🆕 VENDOR RATE CARD LOGIC - UPDATED METHOD
-    # ═══════════════════════════════════════════════════════════════════════════════
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        """
-        VENDOR RATE CARD LOGIC:
-        When a product is selected in a job line, automatically fetch:
-        1. Customer rate card → sets unit_price
-        2. Vendor rate card → sets unit_cost (NEW VENDOR RATE CARD FEATURE)
-
-        Date-based lookup uses the job's scheduled_date if available, otherwise today.
-        """
+        """Auto-fetch costs based on execution type"""
         if self.product_id:
             self.uom_id = self.product_id.uom_id
-
-            # Get the job date for rate lookup
+            
             job_date = (
                 self.job_id.scheduled_date.date()
                 if self.job_id.scheduled_date
                 else fields.Date.context_today(self)
             )
-
-            # ═══════════════════════════════════════════════════════════════════════
-            # CUSTOMER RATE CARD (existing logic - keep as is)
-            # ═══════════════════════════════════════════════════════════════════════
+            
+            # CUSTOMER RATE CARD
             if self.job_id.partner_id:
                 customer_rate = self.env['fms.rate.card'].get_rate_for_customer(
                     self.job_id.partner_id.id,
@@ -784,11 +743,9 @@ class FMSJobLine(models.Model):
                 )
                 if customer_rate:
                     self.unit_price = customer_rate.unit_price
-
-            # ═══════════════════════════════════════════════════════════════════════
-            # 🆕 VENDOR RATE CARD (NEW LOGIC - ADDED HERE)
-            # ═══════════════════════════════════════════════════════════════════════
-            if self.job_id.vendor_id:
+            
+            # VENDOR OR FMS EMPLOYEE COST
+            if self.job_id.execution_type == 'vendor' and self.job_id.vendor_id:
                 vendor_rate = self.env['fms.vendor.rate.card'].get_rate_for_vendor(
                     self.job_id.vendor_id.id,
                     self.product_id.id,
@@ -796,22 +753,16 @@ class FMSJobLine(models.Model):
                 )
                 if vendor_rate:
                     self.unit_cost = vendor_rate.unit_cost
-            # ═══════════════════════════════════════════════════════════════════════
+            
+            elif self.job_id.execution_type == 'fms_employee' and self.job_id.employee_id:
+                employee_cost = self.job_id.employee_id.timesheet_cost or 0
+                self.unit_cost = employee_cost
 
-    # ═══════════════════════════════════════════════════════════════════════════════
-    # 🆕 VENDOR RATE CARD LOGIC - NEW METHOD ADDED HERE
-    # ═══════════════════════════════════════════════════════════════════════════════
     @api.onchange('job_id')
     def _onchange_job_id(self):
-        """
-        VENDOR RATE CARD LOGIC:
-        When the job is changed, refetch vendor rates for the current product.
-        This is useful when moving a line to a different job with a different vendor.
-        """
+        """When job is changed, refetch costs"""
         if self.product_id and self.job_id:
             self._onchange_product_id()
-
-    # ═══════════════════════════════════════════════════════════════════════════════
 
     # ---------------------------------------------------------
     # TRIGGER AFTER LINE SAVED
@@ -835,7 +786,6 @@ class FMSJobLine(models.Model):
         for job, add_lines in additional_by_job.items():
             job._check_and_trigger_scope_approval(add_lines)
         return records
-
     def write(self, vals):
         result = super().write(vals)
         trigger_fields = {'product_id', 'quantity', 'uom_id', 'unit_cost', 'unit_price'}
